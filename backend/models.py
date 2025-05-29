@@ -75,6 +75,8 @@ class User(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     last_login: Optional[datetime] = None
     auth_source: str = "local"  # "ldap" or "local"
+    preferred_llm_server: Optional[str] = None  # Serveur LLM préféré
+    preferred_model: Optional[str] = None  # Modèle préféré
 
 class UserCreate(BaseModel):
     uid: str
