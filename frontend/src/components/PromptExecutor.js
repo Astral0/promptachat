@@ -42,15 +42,27 @@ function PromptExecutor() {
 
   const loadPrompt = async () => {
     try {
-      const response = await axios.get(`${API}/prompts/${id}`);
-      setPrompt(response.data);
+      const [promptResponse, serversResponse] = await Promise.all([
+        axios.get(`${API}/prompts/${id}`),
+        axios.get(`${API}/llm/servers`)
+      ]);
+      
+      setPrompt(promptResponse.data);
+      setServers(serversResponse.data);
       
       // Initialize variables
       const initialVariables = {};
-      response.data.variables?.forEach(variable => {
+      promptResponse.data.variables?.forEach(variable => {
         initialVariables[variable] = '';
       });
       setVariables(initialVariables);
+      
+      // Set default server (first available or user preference)
+      const serverNames = Object.keys(serversResponse.data);
+      if (serverNames.length > 0) {
+        setSelectedServer(serverNames[0]);
+        loadModelsForServer(serverNames[0]);
+      }
     } catch (error) {
       console.error('Error loading prompt:', error);
     } finally {
