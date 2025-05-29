@@ -236,7 +236,7 @@ function PromptExecutor() {
               {prompt.type === 'internal' ? (
                 <ComputerDesktopIcon className="h-5 w-5 text-green-600" />
               ) : (
-                <ExternalLinkIcon className="h-5 w-5 text-blue-600" />
+                <ArrowTopRightOnSquareIcon className="h-5 w-5 text-blue-600" />
               )}
               <span className="text-sm text-gray-500">
                 {prompt.type === 'internal' ? 'Prompt Interne' : 'Prompt Externe'}
