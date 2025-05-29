@@ -24,6 +24,10 @@ function PromptExecutor() {
   const [variables, setVariables] = useState({});
   const [cockpitId, setCockpitId] = useState('');
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [servers, setServers] = useState({});
+  const [selectedServer, setSelectedServer] = useState('');
+  const [selectedModel, setSelectedModel] = useState('');
+  const [availableModels, setAvailableModels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [executing, setExecuting] = useState(false);
   const [response, setResponse] = useState('');
