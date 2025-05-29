@@ -294,17 +294,116 @@ async def generate_external_prompt(
         }
     }
 
+@api_router.post("/llm/chat/server")
+async def chat_with_specific_server(
+    request: ChatRequest,
+    server_name: str,
+    model: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Chat with a specific LLM server."""
+    # Get prompt and fill with context
+    prompt_data = prompt_service.get_prompt_by_id(request.prompt_id, current_user.id)
+    if not prompt_data:
+        raise HTTPException(status_code=404, detail="Prompt non trouvé")
+    
+    # Fill prompt with variables
+    filled_prompt = prompt_data['content']
+    for var, value in request.context_variables.items():
+        filled_prompt = filled_prompt.replace(f"{{{var}}}", value)
+    
+    # Create LLM request
+    llm_request = LLMRequest(prompt=filled_prompt, stream=True, model=model)
+    
+    # Stream response
+    async def generate():
+        async for chunk in llm_service.chat_with_server(server_name, llm_request, model):
+            yield f"data: {json.dumps({'content': chunk})}\n\n"
+        yield "data: [DONE]\n\n"
+    
+    return StreamingResponse(generate(), media_type="text/plain")
+
+@api_router.get("/llm/servers")
+async def get_llm_servers():
+    """Get all configured LLM servers."""
+    servers = llm_service.get_servers()
+    return {
+        name: {
+            "name": server.name,
+            "type": server.type,
+            "url": server.url,
+            "default_model": server.default_model,
+            "has_api_key": server.api_key is not None
+        }
+        for name, server in servers.items()
+    }
+
+@api_router.get("/llm/servers/{server_name}/test")
+async def test_llm_server(server_name: str):
+    """Test connectivity to a specific LLM server."""
+    test_result = await llm_service.test_server(server_name)
+    return test_result
+
+@api_router.get("/llm/servers/test-all")
+async def test_all_llm_servers():
+    """Test connectivity to all configured LLM servers."""
+    test_results = await llm_service.test_all_servers()
+    return test_results
+
+@api_router.get("/llm/servers/{server_name}/models")
+async def get_server_models(server_name: str):
+    """Get available models for a specific server."""
+    models = await llm_service.get_server_models(server_name)
+    return {"models": models}
+
 @api_router.get("/llm/models")
 async def get_available_models():
     """Get available LLM models."""
     models = llm_service.get_available_models()
+    return models
+
+# ===============================
+# User Preferences Routes
+# ===============================
+
+@api_router.get("/user/preferences", response_model=UserPreferences)
+async def get_user_preferences(current_user: User = Depends(get_current_user)):
+    """Get current user preferences."""
+    return UserPreferences(
+        preferred_llm_server=current_user.preferred_llm_server,
+        preferred_model=current_user.preferred_model
+    )
+
+@api_router.put("/user/preferences")
+async def update_user_preferences(
+    preferences: UserPreferences,
+    current_user: User = Depends(get_current_user)
+):
+    """Update user preferences."""
+    updated_user = auth_service.update_user(
+        current_user.uid,
+        preferred_llm_server=preferences.preferred_llm_server,
+        preferred_model=preferences.preferred_model
+    )
+    if not updated_user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
     
-    # Get Ollama models dynamically
-    try:
-        ollama_models = await llm_service.get_ollama_models()
-        models['ollama'] = ollama_models
-    except:
-        pass
+    return {"message": "Préférences mises à jour avec succès"}
+
+@api_router.get("/llm/models")
+async def get_available_models():
+    """Get available LLM models.""" 
+    models = llm_service.get_available_models()
+    
+    # Get dynamic models for servers that support it
+    servers = llm_service.get_servers()
+    for server_name, server in servers.items():
+        try:
+            dynamic_models = await llm_service.get_server_models(server_name)
+            if dynamic_models:
+                models[server_name] = dynamic_models
+        except:
+            pass  # Keep default model if dynamic fetch fails
     
     return models
 
