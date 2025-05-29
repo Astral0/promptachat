@@ -21,6 +21,7 @@ function Layout() {
   const navigation = [
     { name: 'Tableau de bord', href: '/', icon: HomeIcon },
     { name: 'Bibliothèque', href: '/prompts', icon: BookOpenIcon },
+    { name: 'Paramètres', href: '/settings', icon: CogIcon },
   ];
 
   if (user?.role === 'admin') {
