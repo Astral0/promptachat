@@ -1,0 +1,56 @@
+{
+  "internal": [
+    {
+      "id": "analyse_contrat",
+      "title": "Analyse de Contrat Fournisseur",
+      "content": "En tant qu'expert en achats, analyse ce contrat fournisseur et identifie:\n\n1. Les points clés à négocier\n2. Les risques potentiels\n3. Les opportunités d'amélioration\n\nContrat: {contrat_content}\n\nDonnées fournisseur (Cockpit): {cockpit_data}\n\nContexte supplémentaire: {contexte_supplementaire}",
+      "variables": ["contrat_content", "cockpit_data", "contexte_supplementaire"],
+      "accepts_files": true,
+      "needs_cockpit": true,
+      "category": "Analyse",
+      "welcome_page_html": "<h1>🔍 Analyse de Contrat</h1><p>Cet outil vous aide à analyser en profondeur vos contrats fournisseurs en utilisant l'IA.</p><h3>Comment utiliser:</h3><ul><li>Téléversez votre contrat (PDF)</li><li>Renseignez l'ID Cockpit du fournisseur</li><li>Ajoutez du contexte si nécessaire</li></ul>"
+    },
+    {
+      "id": "evaluation_fournisseur",
+      "title": "Évaluation Performance Fournisseur",
+      "content": "Évalue la performance de ce fournisseur basé sur les critères suivants:\n\n**Données fournisseur:** {cockpit_data}\n\n**Critères d'évaluation:**\n- Qualité des livraisons\n- Respect des délais\n- Compétitivité tarifaire\n- Innovation\n- Durabilité/RSE\n\n**Contexte projet:** {contexte_projet}\n\nFournis une notation détaillée et des recommandations d'amélioration.",
+      "variables": ["cockpit_data", "contexte_projet"],
+      "accepts_files": false,
+      "needs_cockpit": true,
+      "category": "Évaluation",
+      "welcome_page_html": "<h1>📊 Évaluation Fournisseur</h1><p>Évaluez objectivement vos fournisseurs selon des critères standardisés.</p>"
+    },
+    {
+      "id": "negociation_assistant",
+      "title": "Assistant de Négociation",
+      "content": "Prépare une stratégie de négociation pour:\n\n**Fournisseur:** {nom_fournisseur}\n**Objet:** {objet_negociation}\n**Budget cible:** {budget_cible}\n**Données historiques:** {cockpit_data}\n\nInclude:\n1. Arguments de négociation\n2. Points de levier\n3. Alternatives (BATNA)\n4. Tactiques recommandées\n5. Grille de négociation",
+      "variables": ["nom_fournisseur", "objet_negociation", "budget_cible", "cockpit_data"],
+      "accepts_files": false,
+      "needs_cockpit": true,
+      "category": "Négociation",
+      "welcome_page_html": "<h1>🤝 Assistant Négociation</h1><p>Préparez vos négociations avec des stratégies IA-assistées.</p>"
+    }
+  ],
+  "external": [
+    {
+      "id": "benchmark_marche",
+      "title": "Benchmark Marché",
+      "content": "Effectue un benchmark marché pour {categorie_achat} en {region_geographique}.\n\nAnalyse:\n- Les principaux acteurs du marché\n- Les prix moyens constatés\n- Les tendances d'évolution\n- Les innovations récentes\n- Les risques sectoriels\n\nContexte: {contexte_specifique}\n\nFournis un rapport détaillé avec sources.",
+      "variables": ["categorie_achat", "region_geographique", "contexte_specifique"],
+      "accepts_files": false,
+      "needs_cockpit": false,
+      "category": "Veille",
+      "welcome_page_html": "<h1>📈 Benchmark Marché</h1><p>Analysez votre marché avec l'intelligence artificielle publique.</p><p><strong>⚠️ Attention:</strong> Ne pas inclure de données confidentielles.</p>"
+    },
+    {
+      "id": "redaction_cahier_charges",
+      "title": "Rédaction Cahier des Charges",
+      "content": "Rédige un cahier des charges pour:\n\n**Projet:** {nom_projet}\n**Catégorie:** {categorie_achat}\n**Budget estimé:** {budget_estime}\n**Contraintes techniques:** {contraintes_techniques}\n**Délais:** {delais_souhaites}\n\nLe cahier des charges doit inclure:\n1. Contexte et objectifs\n2. Spécifications techniques détaillées\n3. Critères de sélection\n4. Modalités de réponse\n5. Planning prévisionnel\n6. Conditions contractuelles",
+      "variables": ["nom_projet", "categorie_achat", "budget_estime", "contraintes_techniques", "delais_souhaites"],
+      "accepts_files": false,
+      "needs_cockpit": false,
+      "category": "Rédaction",
+      "welcome_page_html": "<h1>📝 Cahier des Charges</h1><p>Générez des cahiers des charges structurés et complets.</p>"
+    }
+  ]
+}
