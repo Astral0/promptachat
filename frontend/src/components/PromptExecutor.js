@@ -487,7 +487,7 @@ function PromptExecutor() {
                         className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                       >
                         ChatGPT
-                        <ExternalLinkIcon className="h-3 w-3 ml-1" />
+                        <ArrowTopRightOnSquareIcon className="h-3 w-3 ml-1" />
                       </a>
                       <a
                         href="https://claude.ai/"
@@ -496,7 +496,7 @@ function PromptExecutor() {
                         className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                       >
                         Claude
-                        <ExternalLinkIcon className="h-3 w-3 ml-1" />
+                        <ArrowTopRightOnSquareIcon className="h-3 w-3 ml-1" />
                       </a>
                       <a
                         href="https://www.perplexity.ai/"
@@ -505,7 +505,7 @@ function PromptExecutor() {
                         className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                       >
                         Perplexity
-                        <ExternalLinkIcon className="h-3 w-3 ml-1" />
+                        <ArrowTopRightOnSquareIcon className="h-3 w-3 ml-1" />
                       </a>
                     </div>
                   </div>
