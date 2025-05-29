@@ -187,11 +187,6 @@ async def get_categories():
     """Get all prompt categories."""
     return prompt_service.get_categories()
 
-@api_router.get("/prompts/categories")
-async def get_categories():
-    """Get all prompt categories."""
-    return prompt_service.get_categories()
-
 @api_router.get("/prompts/search")
 async def search_prompts(
     q: str,
