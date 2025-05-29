@@ -195,7 +195,9 @@ class AuthService:
                     full_name=full_name,
                     role=UserRole(existing_user['role']),
                     is_active=bool(existing_user['is_active']),
-                    auth_source="ldap"
+                    auth_source="ldap",
+                    preferred_llm_server=existing_user['preferred_llm_server'],
+                    preferred_model=existing_user['preferred_model']
                 )
             else:
                 # Create new user
