@@ -32,9 +32,20 @@ class LLMServerManager:
                     parts = server_config.split(':')
                     if len(parts) >= 4:
                         server_type = parts[0]
-                        url = parts[1] + ':' + parts[2] if parts[2] else parts[1]
-                        api_key = parts[3] if parts[3] != 'none' else None
-                        default_model = parts[4] if len(parts) > 4 else 'default'
+                        # Reconstruction de l'URL (peut contenir des ':')
+                        if parts[1].startswith('http'):
+                            if len(parts) >= 5:
+                                url = f"{parts[1]}:{parts[2]}:{parts[3]}"
+                                api_key = parts[4] if parts[4] != 'none' else None
+                                default_model = parts[5] if len(parts) > 5 else 'default'
+                            else:
+                                url = f"{parts[1]}:{parts[2]}"
+                                api_key = parts[3] if parts[3] != 'none' else None
+                                default_model = parts[4] if len(parts) > 4 else 'default'
+                        else:
+                            url = parts[1]
+                            api_key = parts[2] if parts[2] != 'none' else None
+                            default_model = parts[3] if len(parts) > 3 else 'default'
                         
                         self.servers[server_name] = LLMServerConfig(
                             name=server_name,
