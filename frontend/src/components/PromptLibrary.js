@@ -208,7 +208,7 @@ function PromptSection({ title, subtitle, prompts, type, onDuplicate, onDelete }
           {type === 'internal' ? (
             <ComputerDesktopIcon className="h-6 w-6 text-green-600 mr-3" />
           ) : (
-            <ExternalLinkIcon className="h-6 w-6 text-blue-600 mr-3" />
+            <ArrowTopRightOnSquareIcon className="h-6 w-6 text-blue-600 mr-3" />
           )}
           <div>
             <h3 className="text-lg font-medium text-gray-900">{title}</h3>
