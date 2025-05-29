@@ -293,7 +293,7 @@ class AuthService:
             values = []
             
             for field, value in updates.items():
-                if field in ['email', 'full_name', 'role', 'is_active']:
+                if field in ['email', 'full_name', 'role', 'is_active', 'preferred_llm_server', 'preferred_model']:
                     fields.append(f"{field} = ?")
                     values.append(value)
             
