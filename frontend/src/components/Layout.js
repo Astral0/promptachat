@@ -26,7 +26,7 @@ function Layout() {
   ];
 
   if (user?.role === 'admin') {
-    navigation.push({ name: 'Administration', href: '/admin', icon: CogIcon });
+    navigation.push({ name: 'Administration', href: '/admin', icon: ShieldCheckIcon });
   }
 
   const handleLogout = () => {
