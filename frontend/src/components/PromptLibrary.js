@@ -9,7 +9,7 @@ import {
   PencilIcon,
   DocumentDuplicateIcon,
   TrashIcon,
-  ExternalLinkIcon,
+  ArrowTopRightOnSquareIcon,
   ComputerDesktopIcon
 } from '@heroicons/react/24/outline';
 
