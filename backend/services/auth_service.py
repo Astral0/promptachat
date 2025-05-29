@@ -262,7 +262,9 @@ class AuthService:
                 full_name=user_row['full_name'],
                 role=UserRole(user_row['role']),
                 is_active=bool(user_row['is_active']),
-                auth_source=user_row['auth_source']
+                auth_source=user_row['auth_source'],
+                preferred_llm_server=user_row['preferred_llm_server'],
+                preferred_model=user_row['preferred_model']
             )
     
     def list_users(self) -> list[User]:
