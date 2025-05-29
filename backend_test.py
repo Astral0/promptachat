@@ -263,6 +263,31 @@ def main():
         tester.test_llm_generate_external(prompt_id)
         tester.test_get_llm_models()
         
+        # Test LLM server management
+        success, servers_response = tester.test_get_llm_servers()
+        if success:
+            print(f"Found {len(servers_response)} LLM servers")
+            
+            # Test all servers at once
+            tester.test_test_all_llm_servers()
+            
+            # Test each server individually
+            for server_name in servers_response:
+                tester.test_test_llm_server(server_name)
+                tester.test_get_llm_server_models(server_name)
+            
+            # Test user preferences
+            tester.test_get_user_preferences()
+            
+            # Update user preferences with first server if available
+            if servers_response:
+                first_server = list(servers_response.keys())[0]
+                first_model = servers_response[first_server].get("default_model", "")
+                tester.test_update_user_preferences(first_server, first_model)
+                
+                # Test chat with server (this might fail if servers are not accessible)
+                tester.test_chat_with_server(first_server, first_model)
+        
         # Clean up
         tester.test_delete_prompt(prompt_id)
     
