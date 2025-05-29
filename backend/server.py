@@ -29,7 +29,7 @@ load_dotenv(ROOT_DIR / '.env')
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db_config = get_database_config()
-db = client[db_config['prompts_db_name']]
+db = client[os.environ.get('DB_NAME', db_config['prompts_db_name'])]
 
 # Initialize services
 auth_service = AuthService()
