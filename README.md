@@ -4,6 +4,7 @@
 ![React](https://img.shields.io/badge/React-18.x-61DAFB.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.110.x-009688.svg)
 ![MongoDB](https://img.shields.io/badge/MongoDB-7.x-47A248.svg)
+![Docker](https://img.shields.io/badge/Docker-Supported-2496ED.svg)
 
 PromptAchat est une application web complète dédiée à la gestion et l'utilisation de prompts IA pour les équipes Achat. Elle permet de créer, organiser et exécuter des prompts avec des LLMs locaux (Ollama) ou des plateformes externes (ChatGPT, Claude, etc.).
 
@@ -11,363 +12,409 @@ PromptAchat est une application web complète dédiée à la gestion et l'utilis
 
 - **🔐 Authentification hybride** : LDAP + base locale SQLite
 - **📚 Bibliothèque de prompts** : Système et utilisateur, internes et externes
-- **⚡ Exécution temps réel** : Streaming avec Ollama et génération pour plateformes externes
+- **⚡ Exécution temps réel** : Streaming avec serveurs LLM multiples
+- **🤖 Gestion serveurs LLM** : Configuration et test de multiples serveurs
 - **📄 Support PDF** : Extraction automatique de texte pour contexte
 - **🔍 Vérification confidentialité** : Analyse automatique des données sensibles
 - **👥 Gestion utilisateurs** : Panel d'administration complet
 - **📝 Éditeur avancé** : Variables dynamiques et aperçu temps réel
+- **⚙️ Préférences utilisateur** : Sélection de serveurs et modèles préférés
 
-## 📋 Prérequis
+## 🏃‍♂️ Installation Rapide
 
-### Obligatoires
-- **Node.js** >= 18.x
-- **Python** >= 3.9
-- **MongoDB** >= 5.x
-- **Yarn** (pour le frontend)
+### Option 1: Installation Automatisée (Recommandée)
 
-### Optionnels
-- **Ollama** (pour l'exécution de prompts internes)
-- **Serveur LDAP** (pour l'authentification d'entreprise)
+```bash
+# Linux/macOS
+git clone <votre-repo>
+cd promptachat
+chmod +x install.sh
+./install.sh
 
-## 🛠️ Installation et Configuration
+# Windows (PowerShell en administrateur)
+git clone <votre-repo>
+cd promptachat
+.\install.ps1
+```
 
-### 1. Clonage du Projet
+### Option 2: Docker Compose
 
 ```bash
 git clone <votre-repo>
 cd promptachat
+make install  # ou docker-compose up -d
 ```
 
-### 2. Configuration de MongoDB
-
-**Option A : MongoDB Local**
-```bash
-# Installation sur Ubuntu/Debian
-sudo apt update
-sudo apt install -y mongodb
-
-# Démarrage du service
-sudo systemctl start mongodb
-sudo systemctl enable mongodb
-
-# Vérification
-mongo --eval "db.adminCommand('ismaster')"
-```
-
-**Option B : MongoDB avec Docker**
-```bash
-docker run -d --name mongodb -p 27017:27017 mongo:latest
-```
-
-### 3. Configuration du Backend
+### Option 3: Makefile (Développeurs)
 
 ```bash
-cd backend
-
-# Installation des dépendances Python
-python -m pip install -r requirements.txt
-
-# Configuration de l'environnement
-cp .env.example .env
+make help      # Voir toutes les commandes
+make install   # Installation complète
+make start     # Démarrer l'application
+make logs      # Voir les logs
+make stop      # Arrêter
 ```
 
-**Modifiez le fichier `.env` :**
-```env
-MONGO_URL=mongodb://localhost:27017
-DB_NAME=promptachat_db
-```
+## 📋 Commandes Principales
 
-### 4. Configuration de l'Application
+| Commande | Description |
+|----------|-------------|
+| `make start` | Démarrer l'application |
+| `make stop` | Arrêter l'application |
+| `make logs` | Voir les logs en temps réel |
+| `make health` | Vérifier l'état des services |
+| `make backup` | Sauvegarder la base de données |
+| `make update` | Mettre à jour l'application |
 
-```bash
-# Copiez le fichier de configuration template
-cp config.ini.template config.ini
-```
+## 🔧 Configuration
 
-**Modifiez `config.ini` selon vos besoins :**
+### Serveurs LLM
+
+Configurez vos serveurs LLM dans `config.ini` :
 
 ```ini
-[app]
-name = edf  # ou enedis
-title = PromptAchat - Bibliothèque de Prompts EDF
-logo_url = https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/EDF_logo.svg/1200px-EDF_logo.svg.png
-contact_email = contact@votre-entreprise.fr
+[llm_servers]
+# Serveur Ollama local
+ollama = ollama|http://localhost:11434|none|llama3
 
-[ollama]
-enabled = true
-url = http://localhost:11434/v1
-default_model = llama3
+# API OpenAI
+openai = openai|https://api.openai.com/v1|sk-your-key|gpt-3.5-turbo
 
+# Serveur interne
+internal = openai|http://your-server:8080/v1|your-token|llama3
+```
+
+### LDAP Entreprise
+
+```ini
 [ldap]
-enabled = false  # Mettez true si vous avez un serveur LDAP
-server = ldap.votre-entreprise.com
-port = 389
-user_dn_format = uid=%%s,ou=people,dc=votre-entreprise,dc=com
-
-[security]
-initial_admin_uids = admin,votre_uid  # UIDs des admins initiaux
-jwt_secret_key = CHANGEZ_MOI_EN_PRODUCTION_AVEC_VALEUR_ALEATOIRE
+enabled = true
+server = ldap.yourcompany.com
+user_dn_format = uid=%%s,ou=employees,dc=company,dc=com
 ```
 
-### 5. Configuration du Frontend
+## 📊 Architecture
 
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   React SPA     │    │   FastAPI       │    │   MongoDB       │
+│   (Frontend)    │◄──►│   (Backend)     │◄──►│   (Database)    │
+│   Port 3000     │    │   Port 8001     │    │   Port 27017    │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         │              ┌─────────────────┐              │
+         └──────────────►│   LLM Servers   │◄─────────────┘
+                         │   (Ollama, etc.)│
+                         │   Port 11434    │
+                         └─────────────────┘
+```
+
+## 🌐 URLs d'Accès
+
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8001
+- **Documentation API**: http://localhost:8001/docs
+- **MongoDB**: localhost:27017
+
+## 👤 Connexion par Défaut
+
+- **Utilisateur**: `admin`
+- **Mot de passe**: `admin`
+
+⚠️ **Important**: Changez ce mot de passe en production !
+
+## 🐳 Installation avec Docker
+
+### Prérequis
+- Docker Desktop (Windows/macOS) ou Docker Engine (Linux)
+- Docker Compose
+- 4GB RAM minimum
+- 10GB espace disque
+
+### Démarrage Rapide
 ```bash
-cd frontend
-
-# Installation des dépendances
-yarn install
-
-# Configuration de l'environnement
-cp .env.example .env
-```
-
-**Modifiez le fichier `.env` :**
-```env
-REACT_APP_BACKEND_URL=http://localhost:8001
-```
-
-### 6. Installation d'Ollama (Optionnel)
-
-**Sur Linux/macOS :**
-```bash
-curl -fsSL https://ollama.ai/install.sh | sh
-
-# Téléchargement d'un modèle
-ollama pull llama3
-```
-
-**Sur Windows :** Téléchargez depuis [ollama.ai](https://ollama.ai)
-
-## 🚀 Lancement de l'Application
-
-### Option A : Lancement Manuel
-
-**Terminal 1 - MongoDB (si pas déjà lancé) :**
-```bash
-mongod
-```
-
-**Terminal 2 - Backend :**
-```bash
-cd backend
-uvicorn server:app --host 0.0.0.0 --port 8001 --reload
-```
-
-**Terminal 3 - Frontend :**
-```bash
-cd frontend
-yarn start
-```
-
-**Terminal 4 - Ollama (optionnel) :**
-```bash
-ollama serve
-```
-
-### Option B : Avec Docker Compose (Avancé)
-
-```bash
-# Créez un docker-compose.yml
+# Cloner et démarrer
+git clone <votre-repo>
+cd promptachat
 docker-compose up -d
+
+# Voir les logs
+docker-compose logs -f
+
+# Arrêter
+docker-compose down
 ```
 
-## 🔐 Premier Démarrage
+### Services Inclus
+- ✅ **Frontend React** (Port 3000)
+- ✅ **Backend FastAPI** (Port 8001)  
+- ✅ **MongoDB** (Port 27017)
+- ✅ **Ollama** (Port 11434) - Optionnel
+- ✅ **Nginx** (Port 80/443) - Production
 
-### 1. Accès à l'Application
+## 💻 Installation Manuelle
 
-Ouvrez votre navigateur sur : [http://localhost:3000](http://localhost:3000)
+### Prérequis
+- **Node.js** 18+ et **Yarn**
+- **Python** 3.9+ et **pip**
+- **MongoDB** 5.0+
+- **Git**
 
-### 2. Connexion Administrateur
+### Installation des Dépendances
 
-**Identifiants par défaut :**
-- **Utilisateur :** `admin`
-- **Mot de passe :** `admin`
-
-⚠️ **Important :** Changez ce mot de passe en production !
-
-### 3. Vérification du Fonctionnement
-
-1. **Tableau de bord** : Vérifiez que les statistiques s'affichent
-2. **Bibliothèque** : Explorez les prompts système pré-configurés
-3. **Nouveau prompt** : Créez un prompt de test
-4. **Exécution** : Testez avec un prompt externe d'abord
-
-## 📚 Utilisation
-
-### Création d'un Prompt
-
-1. **Aller dans "Bibliothèque"**
-2. **Cliquer "Nouveau prompt"**
-3. **Remplir les informations :**
-   - Titre descriptif
-   - Type (Interne pour Ollama, Externe pour ChatGPT/Claude)
-   - Contenu avec variables `{nom_variable}`
-   - Catégorie pour l'organisation
-
-### Variables Dynamiques
-
-Utilisez des variables dans vos prompts :
-```
-Analysez ce contrat pour {nom_entreprise}.
-Budget disponible : {budget}
-Critères : {criteres_specifiques}
-```
-
-### Exécution de Prompts
-
-**Prompts Internes :**
-- Exécutés avec Ollama en streaming
-- Réponses en temps réel dans l'interface
-
-**Prompts Externes :**
-- Génération de texte optimisé
-- Vérification automatique de confidentialité
-- Liens vers plateformes externes
-
-## 🔧 Configuration Avancée
-
-### LDAP (Entreprise)
-
-```ini
-[ldap]
-enabled = true
-server = ldap.entreprise.com
-port = 389
-user_dn_format = uid=%%s,ou=employees,dc=entreprise,dc=com
-use_ssl = false
-base_dn = dc=entreprise,dc=com
-```
-
-### LLM Interne
-
-```ini
-[internal]
-url = http://votre-llm-interne:8080/v1
-api_key = votre_cle_api
-default_model = votre_modele
-```
-
-### OneAPI Gateway
-
-```ini
-[oneapi]
-use_oneapi = true
-oneapi_url = http://localhost:3000/v1
-api_key = votre_cle_oneapi
-```
-
-## 🐛 Dépannage
-
-### Backend ne démarre pas
-
+**Ubuntu/Debian:**
 ```bash
-# Vérifiez les logs
-tail -f /var/log/promptachat/backend.log
-
-# Vérifiez MongoDB
-mongo --eval "db.adminCommand('ismaster')"
-
-# Vérifiez les dépendances
-pip install -r requirements.txt
+sudo apt update
+sudo apt install nodejs npm python3 python3-pip mongodb git
+npm install -g yarn
 ```
 
-### Frontend ne se compile pas
-
+**macOS:**
 ```bash
-# Nettoyage du cache
-rm -rf node_modules package-lock.json
-yarn install
-
-# Vérifiez les variables d'environnement
-cat .env
+brew install node python mongodb git yarn
 ```
 
-### Ollama non accessible
-
-```bash
-# Vérifiez le service
-ollama list
-
-# Test manuel
-curl http://localhost:11434/api/version
-
-# Redémarrage
-ollama serve
+**Windows:**
+```powershell
+choco install nodejs python mongodb git yarn
 ```
 
-### Problèmes d'authentification
-
-```bash
-# Vérifiez la base de données utilisateurs
-sqlite3 user_auth.db "SELECT * FROM users;"
-
-# Réinitialisation admin
-rm user_auth.db
-# Redémarrer le backend
-```
-
-## 📁 Structure du Projet
-
-```
-promptachat/
-├── backend/                 # API FastAPI
-│   ├── server.py           # Serveur principal
-│   ├── models.py           # Modèles Pydantic
-│   ├── config.py           # Gestionnaire de configuration
-│   └── services/           # Services métier
-│       ├── auth_service.py # Authentification
-│       ├── prompt_service.py # Gestion prompts
-│       └── llm_service.py  # Intégration LLM
-├── frontend/               # Interface React
-│   ├── src/
-│   │   ├── App.js         # Application principale
-│   │   └── components/    # Composants React
-├── config.ini             # Configuration principale
-├── prompts.json           # Prompts système
-├── user_prompts.json      # Prompts utilisateur
-└── user_auth.db          # Base utilisateurs locale
-```
-
-## 🔒 Sécurité
-
-### En Développement
-- Utilisateurs admin par défaut
-- JWT avec secret par défaut
-- Pas de vérification HTTPS
-
-### En Production
-- Changez `jwt_secret_key` dans `config.ini`
-- Configurez HTTPS
-- Utilisez des vraies bases de données
-- Activez l'authentification LDAP
-- Surveillez les logs
-
-## 📊 Monitoring
-
-### Logs
+### Configuration
 
 ```bash
 # Backend
-tail -f /var/log/supervisor/backend.err.log
+cd backend
+python -m venv venv
+source venv/bin/activate  # Linux/macOS
+# venv\Scripts\activate   # Windows
+pip install -r requirements.txt
 
-# Frontend  
-tail -f /var/log/supervisor/frontend.out.log
+# Frontend
+cd ../frontend
+yarn install
 
-# MongoDB
-tail -f /var/log/mongodb/mongod.log
+# Configuration
+cd ..
+cp config.ini.template config.ini
 ```
 
-### Health Check
+### Démarrage
 
-- **Backend :** [http://localhost:8001/api/health](http://localhost:8001/api/health)
-- **Frontend :** [http://localhost:3000](http://localhost:3000)
+```bash
+# Terminal 1 - MongoDB
+mongod
+
+# Terminal 2 - Backend
+cd backend && source venv/bin/activate
+uvicorn server:app --host 0.0.0.0 --port 8001 --reload
+
+# Terminal 3 - Frontend
+cd frontend && yarn start
+```
+
+## 🤖 Configuration Ollama
+
+### Installation Ollama
+
+```bash
+# Linux/macOS
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Windows
+# Télécharger depuis https://ollama.ai
+```
+
+### Téléchargement Modèles
+
+```bash
+# Démarrer Ollama
+ollama serve
+
+# Télécharger des modèles
+ollama pull llama3
+ollama pull codellama
+ollama pull mistral
+```
+
+### Configuration dans PromptAchat
+
+```ini
+[llm_servers]
+ollama_local = ollama|http://localhost:11434|none|llama3
+```
+
+## 🔐 Sécurité et Production
+
+### Configuration Sécurisée
+
+```ini
+[security]
+jwt_secret_key = $(openssl rand -base64 32)
+initial_admin_uids = your_admin_uid
+
+[ldap]
+enabled = true
+server = ldap.company.com
+use_ssl = true
+```
+
+### Déploiement Production
+
+```bash
+# Avec Nginx reverse proxy
+make start-prod
+
+# Ou
+docker-compose --profile production up -d
+```
+
+### HTTPS avec SSL
+
+1. Placez vos certificats dans `nginx/ssl/`
+2. Modifiez `nginx/nginx.conf`
+3. Redémarrez Nginx
+
+## 📊 Monitoring et Maintenance
+
+### Surveillance
+
+```bash
+# Statut des services
+make status
+
+# Santé des services
+make health
+
+# Utilisation des ressources
+make monitor
+
+# Logs en temps réel
+make logs
+```
+
+### Sauvegarde
+
+```bash
+# Sauvegarde automatique
+make backup
+
+# Restauration
+make restore BACKUP_FILE=backups/promptachat_backup_20241201_120000.gz
+```
+
+### Mise à Jour
+
+```bash
+# Mise à jour complète
+make update
+
+# Ou manuellement
+git pull
+docker-compose build
+docker-compose up -d
+```
+
+## 🛠️ Développement
+
+### Configuration Développement
+
+```bash
+# Setup environnement local
+make dev-setup
+
+# Démarrage mode dev avec hot reload
+make start-dev
+
+# Tests
+make test
+```
+
+### Structure du Projet
+
+```
+promptachat/
+├── backend/           # API FastAPI
+│   ├── server.py     # Serveur principal
+│   ├── models.py     # Modèles Pydantic
+│   ├── services/     # Services métier
+│   └── Dockerfile    # Image Docker
+├── frontend/         # Interface React
+│   ├── src/
+│   │   ├── App.js   # App principale
+│   │   └── components/ # Composants React
+│   └── Dockerfile   # Image Docker
+├── nginx/           # Configuration Nginx
+├── scripts/         # Scripts d'initialisation
+├── docker-compose.yml # Configuration Docker
+├── Makefile         # Commandes automatisées
+└── install.sh       # Script d'installation
+```
+
+## 🆘 Dépannage
+
+### Problèmes Courants
+
+**Port déjà utilisé:**
+```bash
+# Trouver le processus
+lsof -i :3000  # ou :8001, :27017
+kill -9 <PID>
+```
+
+**Docker ne démarre pas:**
+```bash
+# Vérifier Docker
+docker --version
+docker-compose --version
+
+# Redémarrer Docker
+sudo systemctl restart docker  # Linux
+# Redémarrer Docker Desktop    # Windows/macOS
+```
+
+**MongoDB inaccessible:**
+```bash
+# Vérifier le service
+docker-compose logs mongodb
+
+# Redémarrer MongoDB
+docker-compose restart mongodb
+```
+
+**Erreurs de permissions:**
+```bash
+# Linux - Ajouter utilisateur au groupe docker
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+### Support et Logs
+
+```bash
+# Logs détaillés
+docker-compose logs -f --tail=100
+
+# Accès aux conteneurs
+docker-compose exec backend bash
+docker-compose exec mongodb mongosh
+
+# Nettoyage
+make clean
+```
+
+## 📚 Documentation
+
+- **📖 Guide d'installation**: [INSTALLATION.md](INSTALLATION.md)
+- **🔧 Configuration**: [config.ini.template](config.ini.template)
+- **🤖 API Documentation**: http://localhost:8001/docs
+- **📊 Architecture**: Voir diagrammes ci-dessus
 
 ## 🤝 Contribution
 
 1. Fork le projet
-2. Créez une branche feature
-3. Committez vos changements
-4. Poussez vers la branche
+2. Créez une branche feature (`git checkout -b feature/amazing-feature`)
+3. Committez vos changements (`git commit -m 'Add amazing feature'`)
+4. Poussez vers la branche (`git push origin feature/amazing-feature`)
 5. Ouvrez une Pull Request
 
 ## 📄 Licence
@@ -376,10 +423,12 @@ Ce projet est sous licence MIT. Voir `LICENSE` pour plus de détails.
 
 ## 🆘 Support
 
-- **Documentation :** Ce README
-- **Issues :** Utilisez le système d'issues GitHub
-- **Email :** contact@votre-entreprise.fr
+- **Issues**: Utilisez le système d'issues GitHub
+- **Email**: contact@votre-entreprise.fr
+- **Documentation**: Ce README et [INSTALLATION.md](INSTALLATION.md)
 
 ---
 
 **Développé avec ❤️ pour optimiser les processus d'achat avec l'IA**
+
+🚀 **Prêt à révolutionner vos achats avec l'IA ? Lancez `make install` !**
