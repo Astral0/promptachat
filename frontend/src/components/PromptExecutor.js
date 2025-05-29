@@ -40,6 +40,19 @@ function PromptExecutor() {
     loadPrompt();
   }, [id]);
 
+  const loadModelsForServer = async (serverName) => {
+    try {
+      const response = await axios.get(`${API}/llm/servers/${serverName}/models`);
+      setAvailableModels(response.data.models || []);
+      if (response.data.models && response.data.models.length > 0) {
+        setSelectedModel(response.data.models[0]);
+      }
+    } catch (error) {
+      console.error('Error loading models:', error);
+      setAvailableModels([]);
+    }
+  };
+
   const loadPrompt = async () => {
     try {
       const [promptResponse, serversResponse] = await Promise.all([
