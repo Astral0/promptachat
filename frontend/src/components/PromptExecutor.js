@@ -123,10 +123,13 @@ function PromptExecutor() {
       cockpit_id: cockpitId || null
     };
 
+    const serverName = selectedServer;
+    const model = selectedModel;
+
     try {
       abortControllerRef.current = new AbortController();
       
-      const response = await fetch(`${API}/llm/chat/ollama`, {
+      const response = await fetch(`${API}/llm/chat/server?server_name=${serverName}&model=${model}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
