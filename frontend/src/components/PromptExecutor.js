@@ -294,6 +294,46 @@ function PromptExecutor() {
           <div className="bg-white shadow rounded-lg p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Configuration</h3>
 
+            {/* Server and Model Selection for Internal Prompts */}
+            {prompt.type === 'internal' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Serveur LLM
+                  </label>
+                  <select
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    value={selectedServer}
+                    onChange={(e) => {
+                      setSelectedServer(e.target.value);
+                      loadModelsForServer(e.target.value);
+                    }}
+                  >
+                    {Object.entries(servers).map(([name, server]) => (
+                      <option key={name} value={name}>
+                        {server.name} ({server.type})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Modèle
+                  </label>
+                  <select
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    value={selectedModel}
+                    onChange={(e) => setSelectedModel(e.target.value)}
+                  >
+                    {availableModels.map(model => (
+                      <option key={model} value={model}>{model}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
+
             {/* Variables */}
             {prompt.variables && prompt.variables.length > 0 && (
               <div className="space-y-4">
