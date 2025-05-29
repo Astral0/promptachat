@@ -180,6 +180,45 @@ class PromptAchatTester:
     def test_get_llm_models(self):
         """Test getting available LLM models"""
         return self.run_test("Get LLM Models", "GET", "llm/models", 200)
+        
+    def test_get_llm_servers(self):
+        """Test getting all LLM servers"""
+        return self.run_test("Get LLM Servers", "GET", "llm/servers", 200)
+        
+    def test_test_all_llm_servers(self):
+        """Test testing all LLM servers"""
+        return self.run_test("Test All LLM Servers", "GET", "llm/servers/test-all", 200)
+        
+    def test_test_llm_server(self, server_name):
+        """Test testing a specific LLM server"""
+        return self.run_test(f"Test LLM Server {server_name}", "GET", f"llm/servers/{server_name}/test", 200)
+        
+    def test_get_llm_server_models(self, server_name):
+        """Test getting models for a specific LLM server"""
+        return self.run_test(f"Get Models for LLM Server {server_name}", "GET", f"llm/servers/{server_name}/models", 200)
+        
+    def test_get_user_preferences(self):
+        """Test getting user preferences"""
+        return self.run_test("Get User Preferences", "GET", "user/preferences", 200)
+        
+    def test_update_user_preferences(self, preferred_server=None, preferred_model=None):
+        """Test updating user preferences"""
+        data = {}
+        if preferred_server is not None:
+            data["preferred_llm_server"] = preferred_server
+        if preferred_model is not None:
+            data["preferred_model"] = preferred_model
+            
+        return self.run_test("Update User Preferences", "PUT", "user/preferences", 200, data=data)
+        
+    def test_chat_with_server(self, server_name, model, prompt_text="Bonjour, comment ça va?"):
+        """Test chat with a specific server"""
+        data = {
+            "prompt": prompt_text,
+            "stream": False
+        }
+        endpoint = f"llm/chat/server?server_name={server_name}&model={model}"
+        return self.run_test(f"Chat with Server {server_name} using {model}", "POST", endpoint, 200, data=data)
 
 def main():
     # Setup
