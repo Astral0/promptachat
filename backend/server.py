@@ -17,7 +17,8 @@ import io
 from .models import (
     User, UserLogin, Token, UserCreate, UserUpdate,
     UserPrompt, UserPromptCreate, UserPromptUpdate,
-    ChatRequest, LLMRequest, PromptExecutionResult
+    ChatRequest, LLMRequest, PromptExecutionResult,
+    LLMServerConfig, LLMServerTest, UserPreferences
 )
 from .services import AuthService, PromptService, LLMService
 from .config import get_app_config, get_database_config
