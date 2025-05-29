@@ -282,7 +282,9 @@ class AuthService:
                     full_name=row['full_name'],
                     role=UserRole(row['role']),
                     is_active=bool(row['is_active']),
-                    auth_source=row['auth_source']
+                    auth_source=row['auth_source'],
+                    preferred_llm_server=row['preferred_llm_server'],
+                    preferred_model=row['preferred_model']
                 ))
             
             return users
