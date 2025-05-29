@@ -156,6 +156,8 @@ class AuthService:
                 role=UserRole(user_row['role']),
                 is_active=bool(user_row['is_active']),
                 auth_source=user_row['auth_source'],
+                preferred_llm_server=user_row['preferred_llm_server'],
+                preferred_model=user_row['preferred_model'],
                 last_login=datetime.fromisoformat(user_row['last_login']) if user_row['last_login'] else None
             )
     
