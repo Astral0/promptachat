@@ -170,3 +170,23 @@ class PrivacyCheckResult(BaseModel):
     confidentiality_level: ConfidentialityLevel
     concerns: List[str] = []
     recommendations: List[str] = []
+
+# LLM Server Models
+class LLMServerConfig(BaseModel):
+    name: str
+    type: str  # "ollama" or "openai"
+    url: str
+    api_key: Optional[str] = None
+    default_model: str
+    is_available: bool = False
+
+class LLMServerTest(BaseModel):
+    server_name: str
+    status: str  # "success", "error", "timeout"
+    message: str
+    response_time: Optional[float] = None
+    available_models: List[str] = []
+
+class UserPreferences(BaseModel):
+    preferred_llm_server: Optional[str] = None
+    preferred_model: Optional[str] = None
