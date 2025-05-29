@@ -10,6 +10,7 @@ import PromptLibrary from "./components/PromptLibrary";
 import PromptEditor from "./components/PromptEditor";
 import PromptExecutor from "./components/PromptExecutor";
 import AdminPanel from "./components/AdminPanel";
+import UserSettings from "./components/UserSettings";
 import Layout from "./components/Layout";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
