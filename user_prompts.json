@@ -16,6 +16,21 @@
       "updated_at": "2025-05-29 18:45:25.723020",
       "is_public": true,
       "based_on_system_prompt": null
+    },
+    {
+      "title": "Hello world",
+      "content": "Dis Hello\n",
+      "variables": [],
+      "accepts_files": false,
+      "needs_cockpit": false,
+      "category": "",
+      "welcome_page_html": "page d'accueil",
+      "id": "3a1220f6-0403-41fc-9e78-801e33d5880d",
+      "created_by": "lx4VmiHUgHTo0oMOuUuvbg",
+      "created_at": "2025-05-29 18:47:35.623639",
+      "updated_at": "2025-05-29 18:47:35.623640",
+      "is_public": false,
+      "based_on_system_prompt": null
     }
   ],
   "external": []
