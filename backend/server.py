@@ -1,15 +1,26 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Depends, HTTPException, status, UploadFile, File
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime
+import json
+import PyPDF2
+import io
 
+from .models import (
+    User, UserLogin, Token, UserCreate, UserUpdate,
+    UserPrompt, UserPromptCreate, UserPromptUpdate,
+    ChatRequest, LLMRequest, PromptExecutionResult
+)
+from .services import AuthService, PromptService, LLMService
+from .config import get_app_config, get_database_config
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -17,44 +28,421 @@ load_dotenv(ROOT_DIR / '.env')
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+db_config = get_database_config()
+db = client[db_config['prompts_db_name']]
 
-# Create the main app without a prefix
-app = FastAPI()
+# Initialize services
+auth_service = AuthService()
+prompt_service = PromptService()
+llm_service = LLMService()
+
+# Create the main app
+app = FastAPI(
+    title="PromptAchat",
+    description="Bibliothèque de prompts interactive pour la filière Achat",
+    version="1.0.0"
+)
+
+# Security
+security = HTTPBearer()
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Dependency for authentication
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> User:
+    """Get current authenticated user."""
+    token_data = auth_service.verify_token(credentials.credentials)
+    if not token_data:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token invalide ou expiré"
+        )
+    
+    user = auth_service.get_user_by_uid(token_data.get('uid'))
+    if not user or not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Utilisateur non trouvé ou inactif"
+        )
+    
+    return user
 
-# Define Models
-class StatusCheck(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+# Optional authentication (for public endpoints)
+async def get_current_user_optional(credentials: HTTPAuthorizationCredentials = Depends(security)) -> Optional[User]:
+    """Get current user if authenticated, None otherwise."""
+    try:
+        return await get_current_user(credentials)
+    except HTTPException:
+        return None
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+# Admin user dependency
+async def get_admin_user(current_user: User = Depends(get_current_user)) -> User:
+    """Ensure current user is admin."""
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Accès administrateur requis"
+        )
+    return current_user
 
-# Add your routes to the router instead of directly to app
+# ===============================
+# Authentication Routes
+# ===============================
+
+@api_router.post("/auth/login", response_model=Token)
+async def login(user_data: UserLogin):
+    """User login."""
+    user = auth_service.authenticate(user_data.uid, user_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Identifiants incorrects"
+        )
+    
+    access_token = auth_service.create_token(user)
+    return Token(
+        access_token=access_token,
+        token_type="bearer",
+        expires_in=3600
+    )
+
+@api_router.get("/auth/me", response_model=User)
+async def get_current_user_info(current_user: User = Depends(get_current_user)):
+    """Get current user information."""
+    return current_user
+
+@api_router.get("/auth/config")
+async def get_auth_config():
+    """Get authentication configuration."""
+    app_config = get_app_config()
+    return {
+        "app_name": app_config["name"],
+        "app_title": app_config["title"],
+        "logo_url": app_config.get("logo_url"),
+        "contact_email": app_config["contact_email"]
+    }
+
+# ===============================
+# Prompt Management Routes
+# ===============================
+
+@api_router.get("/prompts")
+async def get_prompts(current_user: Optional[User] = Depends(get_current_user_optional)):
+    """Get all available prompts."""
+    user_id = current_user.id if current_user else None
+    return prompt_service.get_all_prompts(user_id)
+
+@api_router.get("/prompts/{prompt_id}")
+async def get_prompt(prompt_id: str, current_user: Optional[User] = Depends(get_current_user_optional)):
+    """Get specific prompt by ID."""
+    user_id = current_user.id if current_user else None
+    prompt = prompt_service.get_prompt_by_id(prompt_id, user_id)
+    if not prompt:
+        raise HTTPException(status_code=404, detail="Prompt non trouvé")
+    return prompt
+
+@api_router.post("/prompts", response_model=UserPrompt)
+async def create_prompt(
+    prompt_data: UserPromptCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Create new user prompt."""
+    return prompt_service.create_user_prompt(prompt_data, current_user.id)
+
+@api_router.put("/prompts/{prompt_id}", response_model=UserPrompt)
+async def update_prompt(
+    prompt_id: str,
+    prompt_data: UserPromptUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    """Update user prompt."""
+    updated_prompt = prompt_service.update_user_prompt(prompt_id, prompt_data, current_user.id)
+    if not updated_prompt:
+        raise HTTPException(status_code=404, detail="Prompt non trouvé ou non autorisé")
+    return updated_prompt
+
+@api_router.delete("/prompts/{prompt_id}")
+async def delete_prompt(prompt_id: str, current_user: User = Depends(get_current_user)):
+    """Delete user prompt."""
+    success = prompt_service.delete_user_prompt(prompt_id, current_user.id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Prompt non trouvé ou non autorisé")
+    return {"message": "Prompt supprimé avec succès"}
+
+@api_router.post("/prompts/{prompt_id}/duplicate", response_model=UserPrompt)
+async def duplicate_prompt(
+    prompt_id: str,
+    new_title: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Duplicate a prompt."""
+    duplicated = prompt_service.duplicate_prompt(prompt_id, current_user.id, new_title)
+    if not duplicated:
+        raise HTTPException(status_code=404, detail="Prompt non trouvé")
+    return duplicated
+
+@api_router.get("/prompts/categories")
+async def get_categories():
+    """Get all prompt categories."""
+    return prompt_service.get_categories()
+
+@api_router.get("/prompts/search")
+async def search_prompts(
+    q: str,
+    category: Optional[str] = None,
+    type: Optional[str] = None,
+    current_user: Optional[User] = Depends(get_current_user_optional)
+):
+    """Search prompts."""
+    user_id = current_user.id if current_user else None
+    prompt_type = None
+    if type in ['internal', 'external']:
+        from .models import PromptType
+        prompt_type = PromptType(type)
+    
+    return prompt_service.search_prompts(q, user_id, category, prompt_type)
+
+# ===============================
+# LLM Integration Routes
+# ===============================
+
+@api_router.post("/llm/chat/internal")
+async def chat_internal(
+    request: ChatRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Chat with internal LLM."""
+    # Get prompt and fill with context
+    prompt_data = prompt_service.get_prompt_by_id(request.prompt_id, current_user.id)
+    if not prompt_data:
+        raise HTTPException(status_code=404, detail="Prompt non trouvé")
+    
+    # Fill prompt with variables
+    filled_prompt = prompt_data['content']
+    for var, value in request.context_variables.items():
+        filled_prompt = filled_prompt.replace(f"{{{var}}}", value)
+    
+    # Create LLM request
+    llm_request = LLMRequest(prompt=filled_prompt, stream=True)
+    
+    # Stream response
+    async def generate():
+        async for chunk in llm_service.chat_internal(llm_request):
+            yield f"data: {json.dumps({'content': chunk})}\n\n"
+        yield "data: [DONE]\n\n"
+    
+    return StreamingResponse(generate(), media_type="text/plain")
+
+@api_router.post("/llm/chat/ollama")
+async def chat_ollama(
+    request: ChatRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Chat with Ollama."""
+    # Get prompt and fill with context
+    prompt_data = prompt_service.get_prompt_by_id(request.prompt_id, current_user.id)
+    if not prompt_data:
+        raise HTTPException(status_code=404, detail="Prompt non trouvé")
+    
+    # Fill prompt with variables
+    filled_prompt = prompt_data['content']
+    for var, value in request.context_variables.items():
+        filled_prompt = filled_prompt.replace(f"{{{var}}}", value)
+    
+    # Create LLM request
+    llm_request = LLMRequest(prompt=filled_prompt, stream=True)
+    
+    # Stream response
+    async def generate():
+        async for chunk in llm_service.chat_ollama(llm_request):
+            yield f"data: {json.dumps({'content': chunk})}\n\n"
+        yield "data: [DONE]\n\n"
+    
+    return StreamingResponse(generate(), media_type="text/plain")
+
+@api_router.post("/llm/generate-external")
+async def generate_external_prompt(
+    request: ChatRequest,
+    current_user: Optional[User] = Depends(get_current_user_optional)
+):
+    """Generate prompt for external LLM use."""
+    user_id = current_user.id if current_user else None
+    
+    # Get prompt and fill with context
+    prompt_data = prompt_service.get_prompt_by_id(request.prompt_id, user_id)
+    if not prompt_data:
+        raise HTTPException(status_code=404, detail="Prompt non trouvé")
+    
+    # Fill prompt with variables
+    filled_prompt = prompt_data['content']
+    for var, value in request.context_variables.items():
+        filled_prompt = filled_prompt.replace(f"{{{var}}}", value)
+    
+    # Check privacy if enabled
+    privacy_result = await llm_service.check_privacy(filled_prompt)
+    
+    return {
+        "prompt": filled_prompt,
+        "privacy_check": privacy_result,
+        "external_links": {
+            "chatgpt": "https://chat.openai.com/",
+            "claude": "https://claude.ai/",
+            "perplexity": "https://www.perplexity.ai/",
+            "gemini": "https://gemini.google.com/"
+        }
+    }
+
+@api_router.get("/llm/models")
+async def get_available_models():
+    """Get available LLM models."""
+    models = llm_service.get_available_models()
+    
+    # Get Ollama models dynamically
+    try:
+        ollama_models = await llm_service.get_ollama_models()
+        models['ollama'] = ollama_models
+    except:
+        pass
+    
+    return models
+
+# ===============================
+# File Upload Routes
+# ===============================
+
+@api_router.post("/files/upload")
+async def upload_file(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user)
+):
+    """Upload and extract text from PDF file."""
+    if not file.filename.lower().endswith('.pdf'):
+        raise HTTPException(status_code=400, detail="Seuls les fichiers PDF sont acceptés")
+    
+    try:
+        # Read file content
+        content = await file.read()
+        
+        # Extract text from PDF
+        pdf_reader = PyPDF2.PdfReader(io.BytesIO(content))
+        extracted_text = ""
+        
+        for page in pdf_reader.pages:
+            extracted_text += page.extract_text() + "\n"
+        
+        file_id = str(uuid.uuid4())
+        
+        # Store in MongoDB (optional - for now just return the text)
+        file_doc = {
+            "id": file_id,
+            "filename": file.filename,
+            "content_type": file.content_type,
+            "size": len(content),
+            "extracted_text": extracted_text,
+            "uploaded_by": current_user.id,
+            "uploaded_at": datetime.utcnow()
+        }
+        
+        await db.files.insert_one(file_doc)
+        
+        return {
+            "id": file_id,
+            "filename": file.filename,
+            "extracted_text": extracted_text,
+            "size": len(content)
+        }
+        
+    except Exception as e:
+        logger.error(f"File upload error: {e}")
+        raise HTTPException(status_code=500, detail="Erreur lors du traitement du fichier")
+
+# ===============================
+# User Management Routes (Admin)
+# ===============================
+
+@api_router.get("/admin/users", response_model=List[User])
+async def list_users(admin_user: User = Depends(get_admin_user)):
+    """List all users (admin only)."""
+    return auth_service.list_users()
+
+@api_router.post("/admin/users", response_model=User)
+async def create_user(
+    user_data: UserCreate,
+    admin_user: User = Depends(get_admin_user)
+):
+    """Create new user (admin only)."""
+    try:
+        return auth_service.create_user(
+            user_data.uid,
+            user_data.email,
+            user_data.full_name,
+            "default_password",  # User should change on first login
+            user_data.role
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@api_router.put("/admin/users/{user_uid}", response_model=User)
+async def update_user(
+    user_uid: str,
+    user_data: UserUpdate,
+    admin_user: User = Depends(get_admin_user)
+):
+    """Update user (admin only)."""
+    updated_user = auth_service.update_user(user_uid, **user_data.dict(exclude_unset=True))
+    if not updated_user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    return updated_user
+
+@api_router.delete("/admin/users/{user_uid}")
+async def delete_user(
+    user_uid: str,
+    admin_user: User = Depends(get_admin_user)
+):
+    """Delete user (admin only)."""
+    success = auth_service.delete_user(user_uid)
+    if not success:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    return {"message": "Utilisateur supprimé avec succès"}
+
+# ===============================
+# Health Check Routes
+# ===============================
+
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    """Health check endpoint."""
+    app_config = get_app_config()
+    return {
+        "message": f"Bienvenue sur {app_config['title']}",
+        "version": "1.0.0",
+        "status": "running"
+    }
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.dict()
-    status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
+@api_router.get("/health")
+async def health_check():
+    """Detailed health check."""
+    health_status = {
+        "status": "healthy",
+        "timestamp": datetime.utcnow(),
+        "services": {
+            "database": "connected",
+            "llm": {}
+        }
+    }
+    
+    # Check LLM services
+    models = llm_service.get_available_models()
+    for service, model_list in models.items():
+        health_status["services"]["llm"][service] = "available" if model_list else "unavailable"
+    
+    return health_status
 
 # Include the router in the main app
 app.include_router(api_router)
 
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
