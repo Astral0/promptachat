@@ -1,4 +1,22 @@
 {
-  "internal": [],
+  "internal": [
+    {
+      "title": "Une histoire",
+      "content": "Raconte une histoire pour un enfant de 4 ans appelé {toto}\n",
+      "variables": [
+        "toto"
+      ],
+      "accepts_files": false,
+      "needs_cockpit": false,
+      "category": "",
+      "welcome_page_html": "Hello",
+      "id": "c7fcdd8d-1886-4f68-be0a-77a36fedcbb4",
+      "created_by": "lx4VmiHUgHTo0oMOuUuvbg",
+      "created_at": "2025-05-29 18:45:25.723018",
+      "updated_at": "2025-05-29 18:45:25.723020",
+      "is_public": true,
+      "based_on_system_prompt": null
+    }
+  ],
   "external": []
 }
