@@ -45,7 +45,9 @@ class AuthService:
                     is_active BOOLEAN DEFAULT 1,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     last_login TIMESTAMP,
-                    auth_source TEXT DEFAULT 'local'
+                    auth_source TEXT DEFAULT 'local',
+                    preferred_llm_server TEXT,
+                    preferred_model TEXT
                 )
             ''')
             
