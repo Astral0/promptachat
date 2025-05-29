@@ -31,6 +31,25 @@
       "updated_at": "2025-05-29 18:47:35.623640",
       "is_public": false,
       "based_on_system_prompt": null
+    },
+    {
+      "title": "Copie de Analyse de Contrat Fournisseur",
+      "content": "En tant qu'expert en achats, analyse ce contrat fournisseur et identifie:\n\n1. Les points clés à négocier\n2. Les risques potentiels\n3. Les opportunités d'amélioration\n\nContrat: {contrat_content}\n\nDonnées fournisseur (Cockpit): {cockpit_data}\n\nContexte supplémentaire: {contexte_supplementaire}",
+      "variables": [
+        "contrat_content",
+        "cockpit_data",
+        "contexte_supplementaire"
+      ],
+      "accepts_files": true,
+      "needs_cockpit": true,
+      "category": "Analyse",
+      "welcome_page_html": "<h1>🔍 Analyse de Contrat</h1><p>Cet outil vous aide à analyser en profondeur vos contrats fournisseurs en utilisant l'IA.</p><h3>Comment utiliser:</h3><ul><li>Téléversez votre contrat (PDF)</li><li>Renseignez l'ID Cockpit du fournisseur</li><li>Ajoutez du contexte si nécessaire</li></ul>",
+      "id": "8379a48b-b227-46a8-b47b-56fbb9e851fa",
+      "created_by": "lx4VmiHUgHTo0oMOuUuvbg",
+      "created_at": "2025-05-29 19:03:57.763198",
+      "updated_at": "2025-05-29 19:03:57.763199",
+      "is_public": false,
+      "based_on_system_prompt": "analyse_contrat"
     }
   ],
   "external": []
