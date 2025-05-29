@@ -129,6 +129,7 @@ function App() {
               <Route path="prompts/new" element={<PromptEditor />} />
               <Route path="prompts/:id/edit" element={<PromptEditor />} />
               <Route path="prompts/:id/execute" element={<PromptExecutor />} />
+              <Route path="settings" element={<UserSettings />} />
               {user.role === 'admin' && (
                 <Route path="admin" element={<AdminPanel />} />
               )}
