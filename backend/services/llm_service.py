@@ -8,6 +8,7 @@ from datetime import datetime
 
 from ..config import get_llm_config, get_features_config
 from ..models import LLMRequest, LLMResponse, ConfidentialityLevel
+from .llm_server_manager import LLMServerManager
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,7 @@ class LLMService:
     def __init__(self):
         self.llm_config = get_llm_config()
         self.features_config = get_features_config()
+        self.server_manager = LLMServerManager()
         
     async def _make_openai_request(self, url: str, headers: Dict[str, str], 
                                   payload: Dict[str, Any]) -> AsyncGenerator[str, None]:
@@ -45,25 +47,36 @@ class LLMService:
                                     yield content
                         except json.JSONDecodeError:
                             continue
-    
-    async def chat_internal(self, request: LLMRequest) -> AsyncGenerator[str, None]:
-        """Chat with internal LLM."""
-        config = self.llm_config['internal']
-        
-        if not config['url']:
-            yield "Erreur: URL du LLM interne non configurée"
+
+    async def chat_with_server(self, server_name: str, request: LLMRequest, 
+                              model: Optional[str] = None) -> AsyncGenerator[str, None]:
+        """Chat with a specific LLM server."""
+        server = self.server_manager.get_server(server_name)
+        if not server:
+            yield f"Erreur: Serveur {server_name} non trouvé"
             return
         
-        url = f"{config['url']}/chat/completions"
+        # Utiliser le modèle spécifié ou le modèle par défaut du serveur
+        selected_model = model or request.model or server.default_model
+        
+        if server.type == 'ollama':
+            async for chunk in self._chat_ollama(server, request, selected_model):
+                yield chunk
+        elif server.type == 'openai':
+            async for chunk in self._chat_openai(server, request, selected_model):
+                yield chunk
+        else:
+            yield f"Erreur: Type de serveur {server.type} non supporté"
+
+    async def _chat_ollama(self, server, request: LLMRequest, model: str) -> AsyncGenerator[str, None]:
+        """Chat with Ollama server."""
+        url = f"{server.url}/chat/completions"
         headers = {
             'Content-Type': 'application/json'
         }
         
-        if config['api_key']:
-            headers['Authorization'] = f"Bearer {config['api_key']}"
-        
         payload = {
-            'model': request.model or config['default_model'],
+            'model': model,
             'messages': [
                 {'role': 'user', 'content': request.prompt}
             ],
@@ -72,35 +85,7 @@ class LLMService:
             'stream': request.stream
         }
         
-        logger.info(f"Making internal LLM request to {url}")
-        
-        async for chunk in self._make_openai_request(url, headers, payload):
-            yield chunk
-    
-    async def chat_ollama(self, request: LLMRequest) -> AsyncGenerator[str, None]:
-        """Chat with Ollama."""
-        config = self.llm_config['ollama']
-        
-        if not config['enabled']:
-            yield "Erreur: Ollama est désactivé"
-            return
-        
-        url = f"{config['url']}/chat/completions"
-        headers = {
-            'Content-Type': 'application/json'
-        }
-        
-        payload = {
-            'model': request.model or config['default_model'],
-            'messages': [
-                {'role': 'user', 'content': request.prompt}
-            ],
-            'temperature': request.temperature or self.llm_config['default_temperature'],
-            'max_tokens': request.max_tokens or self.llm_config['max_tokens'],
-            'stream': request.stream
-        }
-        
-        logger.info(f"Making Ollama request to {url}")
+        logger.info(f"Making Ollama request to {url} with model {model}")
         
         try:
             async for chunk in self._make_openai_request(url, headers, payload):
@@ -108,25 +93,19 @@ class LLMService:
         except Exception as e:
             logger.error(f"Ollama request failed: {e}")
             yield f"Erreur Ollama: {str(e)}"
-    
-    async def chat_oneapi(self, request: LLMRequest) -> AsyncGenerator[str, None]:
-        """Chat with OneAPI gateway."""
-        config = self.llm_config['oneapi']
-        
-        if not config['use_oneapi']:
-            yield "Erreur: OneAPI est désactivé"
-            return
-        
-        url = f"{config['url']}/chat/completions"
+
+    async def _chat_openai(self, server, request: LLMRequest, model: str) -> AsyncGenerator[str, None]:
+        """Chat with OpenAI-compatible server."""
+        url = f"{server.url}/chat/completions"
         headers = {
             'Content-Type': 'application/json'
         }
         
-        if config['api_key']:
-            headers['Authorization'] = f"Bearer {config['api_key']}"
+        if server.api_key:
+            headers['Authorization'] = f"Bearer {server.api_key}"
         
         payload = {
-            'model': request.model or self.llm_config['external']['default_model'],
+            'model': model,
             'messages': [
                 {'role': 'user', 'content': request.prompt}
             ],
@@ -135,11 +114,36 @@ class LLMService:
             'stream': request.stream
         }
         
-        logger.info(f"Making OneAPI request to {url}")
+        logger.info(f"Making OpenAI request to {url} with model {model}")
         
-        async for chunk in self._make_openai_request(url, headers, payload):
-            yield chunk
-    
+        try:
+            async for chunk in self._make_openai_request(url, headers, payload):
+                yield chunk
+        except Exception as e:
+            logger.error(f"OpenAI request failed: {e}")
+            yield f"Erreur OpenAI: {str(e)}"
+
+    # Méthodes legacy pour compatibilité
+    async def chat_internal(self, request: LLMRequest) -> AsyncGenerator[str, None]:
+        """Chat with internal LLM (legacy method)."""
+        default_server = self.server_manager.get_default_server()
+        if default_server:
+            async for chunk in self.chat_with_server(default_server, request):
+                yield chunk
+        else:
+            yield "Erreur: Aucun serveur LLM configuré"
+
+    async def chat_ollama(self, request: LLMRequest) -> AsyncGenerator[str, None]:
+        """Chat with Ollama (legacy method)."""
+        # Chercher un serveur Ollama
+        for server_name, server in self.server_manager.get_servers().items():
+            if server.type == 'ollama':
+                async for chunk in self.chat_with_server(server_name, request):
+                    yield chunk
+                return
+        
+        yield "Erreur: Aucun serveur Ollama configuré"
+
     async def generate_external_prompt(self, request: LLMRequest) -> str:
         """Generate prompt text for external LLM use."""
         # For external use, we just return the formatted prompt
@@ -153,7 +157,7 @@ class LLMService:
                 'concerns': [],
                 'recommendations': []
             }
-        
+
         privacy_prompt = f"""
 Analyse ce texte pour déterminer son niveau de confidentialité selon la classification suivante:
 - C0: Information publique
@@ -176,12 +180,10 @@ Texte à analyser:
             request = LLMRequest(prompt=privacy_prompt, stream=False)
             response_text = ""
             
-            # Try internal LLM first, then Ollama
-            try:
-                async for chunk in self.chat_internal(request):
-                    response_text += chunk
-            except:
-                async for chunk in self.chat_ollama(request):
+            # Try default server
+            default_server = self.server_manager.get_default_server()
+            if default_server:
+                async for chunk in self.chat_with_server(default_server, request):
                     response_text += chunk
             
             # Parse JSON response
@@ -237,37 +239,25 @@ Texte à analyser:
     
     def get_available_models(self) -> Dict[str, List[str]]:
         """Get list of available models for each LLM provider."""
-        models = {
-            'internal': [],
-            'ollama': [],
-            'oneapi': []
-        }
+        models = {}
         
-        # Add configured default models
-        if self.llm_config['internal']['url']:
-            models['internal'].append(self.llm_config['internal']['default_model'])
-        
-        if self.llm_config['ollama']['enabled']:
-            models['ollama'].append(self.llm_config['ollama']['default_model'])
-        
-        if self.llm_config['oneapi']['use_oneapi']:
-            models['oneapi'].append(self.llm_config['external']['default_model'])
+        for server_name, server in self.server_manager.get_servers().items():
+            models[server_name] = [server.default_model]
         
         return models
     
-    async def get_ollama_models(self) -> List[str]:
-        """Get available Ollama models."""
-        if not self.llm_config['ollama']['enabled']:
-            return []
-        
-        try:
-            url = f"{self.llm_config['ollama']['url']}/models"
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        return [model['name'] for model in data.get('models', [])]
-        except Exception as e:
-            logger.error(f"Failed to get Ollama models: {e}")
-        
-        return [self.llm_config['ollama']['default_model']]
+    async def get_server_models(self, server_name: str) -> List[str]:
+        """Get available models for a specific server."""
+        return await self.server_manager.get_models(server_name)
+    
+    def get_servers(self):
+        """Get all configured servers."""
+        return self.server_manager.get_servers()
+    
+    async def test_server(self, server_name: str):
+        """Test a specific server."""
+        return await self.server_manager.test_server(server_name)
+    
+    async def test_all_servers(self):
+        """Test all configured servers."""
+        return await self.server_manager.test_all_servers()
