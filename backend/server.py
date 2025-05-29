@@ -374,6 +374,34 @@ async def get_available_models():
     return models
 
 # ===============================
+# User Preferences Routes
+# ===============================
+
+@api_router.get("/user/preferences", response_model=UserPreferences)
+async def get_user_preferences(current_user: User = Depends(get_current_user)):
+    """Get current user preferences."""
+    return UserPreferences(
+        preferred_llm_server=current_user.preferred_llm_server,
+        preferred_model=current_user.preferred_model
+    )
+
+@api_router.put("/user/preferences")
+async def update_user_preferences(
+    preferences: UserPreferences,
+    current_user: User = Depends(get_current_user)
+):
+    """Update user preferences."""
+    updated_user = auth_service.update_user(
+        current_user.uid,
+        preferred_llm_server=preferences.preferred_llm_server,
+        preferred_model=preferences.preferred_model
+    )
+    if not updated_user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    
+    return {"message": "Préférences mises à jour avec succès"}
+
+# ===============================
 # File Upload Routes
 # ===============================
 
