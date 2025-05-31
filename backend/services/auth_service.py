@@ -10,7 +10,7 @@ import os
 import json
 
 from backend.config import get_auth_config, get_database_config
-from models import User, UserRole
+from backend.models import User, UserRole
 
 try:
     import ldap3
