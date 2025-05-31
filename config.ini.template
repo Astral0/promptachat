@@ -53,6 +53,15 @@ base_dn = dc=example,dc=com
 user_auth_db_path = user_auth.db
 prompts_db_name = promptachat_db
 
+[file_storage]
+# Configuration pour le stockage local des fichiers
+storage_type = filesystem
+base_directory = uploaded_files
+max_file_size_mb = 10
+allowed_extensions = pdf
+cleanup_temp_files = true
+keep_file_days = 365
+
 [app]
 name = edf
 title = PromptAchat - Bibliothèque de Prompts EDF

@@ -3,7 +3,7 @@
 ![PromptAchat](https://img.shields.io/badge/PromptAchat-v1.0.0-blue.svg)
 ![React](https://img.shields.io/badge/React-18.x-61DAFB.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.110.x-009688.svg)
-![MongoDB](https://img.shields.io/badge/MongoDB-7.x-47A248.svg)
+![SQLite](https://img.shields.io/badge/SQLite-Local-003B57.svg)
 ![Docker](https://img.shields.io/badge/Docker-Supported-2496ED.svg)
 
 PromptAchat est une application web complète dédiée à la gestion et l'utilisation de prompts IA pour les équipes Achat. Elle permet de créer, organiser et exécuter des prompts avec des LLMs locaux (Ollama) ou des plateformes externes (ChatGPT, Claude, etc.).
@@ -14,7 +14,7 @@ PromptAchat est une application web complète dédiée à la gestion et l'utilis
 - **📚 Bibliothèque de prompts** : Système et utilisateur, internes et externes
 - **⚡ Exécution temps réel** : Streaming avec serveurs LLM multiples
 - **🤖 Gestion serveurs LLM** : Configuration et test de multiples serveurs
-- **📄 Support PDF** : Extraction automatique de texte pour contexte
+- **📄 Support PDF** : Extraction automatique de texte pour contexte (stockage local)
 - **🔍 Vérification confidentialité** : Analyse automatique des données sensibles
 - **👥 Gestion utilisateurs** : Panel d'administration complet
 - **📝 Éditeur avancé** : Variables dynamiques et aperçu temps réel
@@ -22,7 +22,44 @@ PromptAchat est une application web complète dédiée à la gestion et l'utilis
 
 ## 🏃‍♂️ Installation Rapide
 
-### Option 1: Installation Automatisée (Recommandée)
+### 🪟 Option 1: Installation Windows Simplifiée (RECOMMANDÉE)
+
+**Installation sans droits administrateur, sans Docker, sans MongoDB !**
+
+```powershell
+# Windows PowerShell (en tant qu'utilisateur normal)
+git clone <votre-repo>
+cd promptachat
+cd windows
+.\install_windows_simple.ps1
+```
+
+**Cette installation :**
+- ✅ Installe automatiquement Miniconda (si nécessaire)
+- ✅ Utilise uniquement SQLite + stockage fichiers local
+- ✅ Pas de MongoDB, pas de Docker
+- ✅ Fonctionne sans droits administrateur
+- ✅ Crée des scripts de démarrage automatiques
+
+**Après installation :**
+```bat
+# Depuis le répertoire windows/
+cd windows
+
+# Démarrage complet de l'application
+.\start_promptachat_manual.bat
+
+# Ou démarrage séparé
+.\start_backend_manual.bat    # Backend seul
+.\start_frontend_manual.bat   # Frontend seul
+
+# Outils de diagnostic et maintenance
+.\check_installation.bat      # Diagnostic complet
+.\resoudre_problemes.bat     # Résolution automatique des problèmes
+.\aide.bat                   # Aide et documentation
+```
+
+### 🐳 Option 2: Installation Docker (Développeurs)
 
 ```bash
 # Linux/macOS
@@ -37,7 +74,7 @@ cd promptachat
 .\install.ps1
 ```
 
-### Option 2: Docker Compose
+### 🔧 Option 3: Docker Compose
 
 ```bash
 git clone <votre-repo>
@@ -45,7 +82,7 @@ cd promptachat
 make install  # ou docker-compose up -d
 ```
 
-### Option 3: Makefile (Développeurs)
+### 📦 Option 4: Makefile (Développeurs)
 
 ```bash
 make help      # Voir toutes les commandes
@@ -93,8 +130,34 @@ server = ldap.yourcompany.com
 user_dn_format = uid=%%s,ou=employees,dc=company,dc=com
 ```
 
+### Stockage des Fichiers
+
+```ini
+[file_storage]
+storage_type = filesystem
+base_directory = uploaded_files
+max_file_size_mb = 10
+allowed_extensions = pdf
+```
+
 ## 📊 Architecture
 
+### Version Simplifiée (Windows/Local)
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   React SPA     │    │   FastAPI       │    │   SQLite +      │
+│   (Frontend)    │◄──►│   (Backend)     │◄──►│   Local Files   │
+│   Port 3000     │    │   Port 8001     │    │   (Database)    │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       
+         │              ┌─────────────────┐              
+         └──────────────►│   LLM Servers   │
+                         │   (Ollama, etc.)│
+                         │   Port 11434    │
+                         └─────────────────┘
+```
+
+### Version Docker (Développement)
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   React SPA     │    │   FastAPI       │    │   MongoDB       │
@@ -114,7 +177,6 @@ user_dn_format = uid=%%s,ou=employees,dc=company,dc=com
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8001
 - **Documentation API**: http://localhost:8001/docs
-- **MongoDB**: localhost:27017
 
 ## 👤 Connexion par Défaut
 
@@ -123,312 +185,311 @@ user_dn_format = uid=%%s,ou=employees,dc=company,dc=com
 
 ⚠️ **Important**: Changez ce mot de passe en production !
 
-## 🐳 Installation avec Docker
+## 🪟 Spécifique Windows - Installation Sans Administrateur
 
-### Prérequis
-- Docker Desktop (Windows/macOS) ou Docker Engine (Linux)
-- Docker Compose
-- 4GB RAM minimum
-- 10GB espace disque
+### Prérequis Minimaux
+- **Windows 10/11**
+- **PowerShell 5.0+** (inclus par défaut)
+- **Droits utilisateur normaux** (pas d'admin requis)
+- **Connexion Internet** pour télécharger Miniconda
 
-### Démarrage Rapide
-```bash
-# Cloner et démarrer
+### Processus d'Installation Automatisé
+
+```powershell
+# 1. Cloner le dépôt
 git clone <votre-repo>
 cd promptachat
-docker-compose up -d
 
-# Voir les logs
-docker-compose logs -f
+# 2. Aller dans le répertoire Windows
+cd windows
 
-# Arrêter
-docker-compose down
+# 3. Lancer l'installation automatique
+.\install_windows_simple.ps1
+
+# 4. Suivre les instructions à l'écran
+# 5. Une fois terminé, lancer l'application
+.\start_promptachat_manual.bat
 ```
 
-### Services Inclus
-- ✅ **Frontend React** (Port 3000)
-- ✅ **Backend FastAPI** (Port 8001)  
-- ✅ **MongoDB** (Port 27017)
-- ✅ **Ollama** (Port 11434) - Optionnel
-- ✅ **Nginx** (Port 80/443) - Production
+### 📚 Documentation Windows Complète
 
-## 💻 Installation Manuelle
+Pour une documentation détaillée de l'installation Windows, consultez :
+**[windows/INSTALLATION_WINDOWS.md](windows/INSTALLATION_WINDOWS.md)**
 
-### Prérequis
-- **Node.js** 18+ et **Yarn**
-- **Python** 3.9+ et **pip**
-- **MongoDB** 5.0+
-- **Git**
+### 🛠️ Scripts Windows Disponibles
 
-### Installation des Dépendances
+Tous les scripts Windows sont maintenant organisés dans le répertoire `windows/` :
 
-**Ubuntu/Debian:**
-```bash
-sudo apt update
-sudo apt install nodejs npm python3 python3-pip mongodb git
-npm install -g yarn
-```
+| Script | Description |
+|--------|-------------|
+| `install_windows_simple.ps1` | **Installation automatique complète** |
+| `start_promptachat_manual.bat` | **Démarrage complet** (recommandé) |
+| `start_backend_manual.bat` | Démarrage backend seul |
+| `start_frontend_manual.bat` | Démarrage frontend seul |
+| `check_installation.bat` | Diagnostic complet de l'installation |
+| `resoudre_problemes.bat` | Résolution automatique des problèmes |
+| `fix_npm_issue.bat` | Correction spécifique npm/Node.js |
+| `liberer_ports.bat` | Libération des ports 3000/8001 |
+| `aide.bat` | Aide et guide d'utilisation |
 
-**macOS:**
-```bash
-brew install node python mongodb git yarn
-```
+### 🎯 Démarrage Rapide Windows
 
-**Windows:**
 ```powershell
-choco install nodejs python mongodb git yarn
+# Depuis la racine du projet
+cd windows
+
+# Pour une première installation
+.\check_installation.bat      # Diagnostic
+.\resoudre_problemes.bat     # Correction automatique
+.\start_promptachat_manual.bat # Démarrage
+
+# Pour un démarrage normal
+.\start_promptachat_manual.bat
+
+# En cas de problème
+.\aide.bat                   # Aide complète
 ```
 
-### Configuration
+### 🛠️ Installation Manuelle Windows avec Conda
 
-```bash
-# Backend
+Si vous préférez installer manuellement ou personnaliser l'installation :
+
+#### Étape 1 : Installation de Miniconda
+
+```powershell
+# Télécharger Miniconda depuis https://docs.conda.io/en/latest/miniconda.html
+# Ou via PowerShell (optionnel) :
+Invoke-WebRequest -Uri "https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe" -OutFile "$env:TEMP\miniconda-installer.exe"
+
+# Lancer l'installation
+Start-Process -FilePath "$env:TEMP\miniconda-installer.exe" -Wait
+
+# IMPORTANT : Cocher "Add to PATH" pendant l'installation
+# Ou ajouter manuellement après installation
+```
+
+#### Étape 2 : Redémarrer PowerShell et Vérifier Conda
+
+```powershell
+# Fermer et rouvrir PowerShell
+# Vérifier que conda fonctionne
+conda --version
+
+# Si conda n'est pas reconnu, ajouter au PATH manuellement :
+# $env:PATH += ";C:\Users\$env:USERNAME\miniconda3\Scripts;C:\Users\$env:USERNAME\miniconda3"
+```
+
+#### Étape 3 : Créer l'Environnement Conda
+
+```powershell
+# Créer un nouvel environnement avec Python 3.11 et Node.js
+conda create -n promptachat python=3.11 nodejs=18 -y
+
+# Activer l'environnement
+conda activate promptachat
+
+# Vérifier l'activation (le prompt doit montrer (promptachat))
+```
+
+#### Étape 4 : Cloner et Configurer le Projet
+
+```powershell
+# Cloner le projet (si pas déjà fait)
+git clone <votre-repo>
+cd promptachat
+
+# Copier la configuration
+copy config.ini.template config.ini
+
+# Créer les répertoires nécessaires
+mkdir backend\uploaded_files
+mkdir backend\data
+mkdir logs
+```
+
+#### Étape 5 : Installation des Dépendances Backend
+
+```powershell
+# Aller dans le dossier backend
 cd backend
-python -m venv venv
-source venv/bin/activate  # Linux/macOS
-# venv\Scripts\activate   # Windows
-pip install -r requirements.txt
 
-# Frontend
-cd ../frontend
-yarn install
+# Vérifier que l'environnement conda est activé
+conda activate promptachat
 
-# Configuration
+# Installer les dépendances Python essentielles
+pip install fastapi uvicorn python-dotenv pydantic sqlalchemy
+
+# Installer les dépendances pour l'authentification
+pip install pyjwt bcrypt
+
+# Installer les dépendances pour les fichiers
+pip install python-multipart PyPDF2
+
+# Installer les dépendances optionnelles pour les services LLM
+pip install requests aiohttp
+
+# Retourner au dossier racine
 cd ..
-cp config.ini.template config.ini
 ```
 
-### Démarrage
+#### Étape 6 : Installation des Dépendances Frontend
 
-```bash
-# Terminal 1 - MongoDB
-mongod
+```powershell
+# Aller dans le dossier frontend
+cd frontend
 
-# Terminal 2 - Backend
-cd backend && source venv/bin/activate
-uvicorn server:app --host 0.0.0.0 --port 8001 --reload
+# S'assurer que npm est disponible
+npm --version
 
-# Terminal 3 - Frontend
-cd frontend && yarn start
+# Installer les dépendances Node.js
+npm install
+
+# Retourner au dossier racine
+cd ..
 ```
 
-## 🤖 Configuration Ollama
+#### Étape 7 : Configuration de l'Application
 
-### Installation Ollama
+```powershell
+# Éditer le fichier config.ini selon vos besoins
+notepad config.ini
 
-```bash
-# Linux/macOS
-curl -fsSL https://ollama.ai/install.sh | sh
-
-# Windows
-# Télécharger depuis https://ollama.ai
+# Configuration minimale pour démarrer :
+# [llm_servers]
+# # Décommenter et configurer selon vos serveurs LLM disponibles
+# 
+# [file_storage]
+# storage_type = filesystem
+# base_directory = uploaded_files
+# max_file_size_mb = 10
 ```
 
-### Téléchargement Modèles
+#### Étape 8 : Test de l'Installation
 
-```bash
-# Démarrer Ollama
-ollama serve
+```powershell
+# Tester le backend
+conda activate promptachat
+cd backend
+python -c "import fastapi, uvicorn, sqlalchemy; print('✅ Backend dependencies OK')"
 
-# Télécharger des modèles
-ollama pull llama3
-ollama pull codellama
-ollama pull mistral
+# Tester le frontend
+cd ../frontend  
+npm list --depth=0 | findstr react
+cd ..
 ```
 
-### Configuration dans PromptAchat
+#### Étape 9 : Utiliser les Scripts Automatiques
 
-```ini
-[llm_servers]
-ollama_local = ollama|http://localhost:11434|none|llama3
+```powershell
+# Aller dans le répertoire des scripts Windows
+cd windows
+
+# Utiliser les scripts automatiques (recommandé)
+.\start_promptachat_manual.bat
 ```
 
-## 🔐 Sécurité et Production
+#### Étape 10 : Premier Démarrage
 
-### Configuration Sécurisée
+```powershell
+# Depuis windows/
+.\start_promptachat_manual.bat
 
-```ini
-[security]
-jwt_secret_key = $(openssl rand -base64 32)
-initial_admin_uids = your_admin_uid
-
-[ldap]
-enabled = true
-server = ldap.company.com
-use_ssl = true
+# Ou lancer séparément :
+# Backend seul : .\start_backend_manual.bat
+# Frontend seul : .\start_frontend_manual.bat
 ```
 
-### Déploiement Production
+#### Étape 11 : Vérification du Fonctionnement
 
-```bash
-# Avec Nginx reverse proxy
-make start-prod
+1. **Backend** : Ouvrir http://localhost:8001/docs
+2. **Frontend** : Ouvrir http://localhost:3000
+3. **Connexion** : admin / admin
 
-# Ou
-docker-compose --profile production up -d
+#### 🔧 Dépannage Installation Manuelle
+
+**Problème : Conda non reconnu**
+```powershell
+# Ajouter Conda au PATH manuellement
+$condaPath = "$env:USERPROFILE\miniconda3"
+[Environment]::SetEnvironmentVariable("PATH", $env:PATH + ";$condaPath;$condaPath\Scripts", "User")
+# Redémarrer PowerShell
 ```
 
-### HTTPS avec SSL
+**Problème : Erreur lors de pip install**
+```powershell
+# Mettre à jour pip
+conda activate promptachat
+python -m pip install --upgrade pip
 
-1. Placez vos certificats dans `nginx/ssl/`
-2. Modifiez `nginx/nginx.conf`
-3. Redémarrez Nginx
-
-## 📊 Monitoring et Maintenance
-
-### Surveillance
-
-```bash
-# Statut des services
-make status
-
-# Santé des services
-make health
-
-# Utilisation des ressources
-make monitor
-
-# Logs en temps réel
-make logs
+# Installer avec cache désactivé
+pip install --no-cache-dir fastapi uvicorn python-dotenv
 ```
 
-### Sauvegarde
+**Problème : Erreur npm install**
+```powershell
+# Nettoyer le cache npm
+npm cache clean --force
 
-```bash
-# Sauvegarde automatique
-make backup
-
-# Restauration
-make restore BACKUP_FILE=backups/promptachat_backup_20241201_120000.gz
+# Supprimer node_modules et réinstaller
+cd frontend
+rmdir /s node_modules
+npm install
 ```
 
-### Mise à Jour
-
-```bash
-# Mise à jour complète
-make update
+**Problème : Port occupé**
+```powershell
+# Utiliser le script automatique
+cd windows
+.\liberer_ports.bat
 
 # Ou manuellement
-git pull
-docker-compose build
-docker-compose up -d
+netstat -ano | findstr :3000
+netstat -ano | findstr :8001
+taskkill /F /PID <numero_processus>
 ```
 
-## 🛠️ Développement
+#### 📦 Personnalisation de l'Installation
 
-### Configuration Développement
-
-```bash
-# Setup environnement local
-make dev-setup
-
-# Démarrage mode dev avec hot reload
-make start-dev
-
-# Tests
-make test
+**Changer le nom de l'environnement Conda :**
+```powershell
+conda create -n mon-promptachat python=3.11 nodejs=18
+conda activate mon-promptachat
+# Puis modifier les scripts .bat pour utiliser "mon-promptachat"
 ```
 
-### Structure du Projet
-
-```
-promptachat/
-├── backend/           # API FastAPI
-│   ├── server.py     # Serveur principal
-│   ├── models.py     # Modèles Pydantic
-│   ├── services/     # Services métier
-│   └── Dockerfile    # Image Docker
-├── frontend/         # Interface React
-│   ├── src/
-│   │   ├── App.js   # App principale
-│   │   └── components/ # Composants React
-│   └── Dockerfile   # Image Docker
-├── nginx/           # Configuration Nginx
-├── scripts/         # Scripts d'initialisation
-├── docker-compose.yml # Configuration Docker
-├── Makefile         # Commandes automatisées
-└── install.sh       # Script d'installation
+**Installer des dépendances supplémentaires :**
+```powershell
+conda activate promptachat
+# Pour Ollama local
+pip install ollama
+# Pour d'autres services LLM
+pip install openai anthropic
 ```
 
-## 🆘 Dépannage
+**Configuration avancée :**
+```ini
+# Dans config.ini
+[file_storage]
+base_directory = D:\mes_fichiers_promptachat  # Chemin personnalisé
+max_file_size_mb = 50                         # Taille de fichier plus importante
 
-### Problèmes Courants
-
-**Port déjà utilisé:**
-```bash
-# Trouver le processus
-lsof -i :3000  # ou :8001, :27017
-kill -9 <PID>
+[llm_servers]
+ollama_local = ollama|http://localhost:11434|none|llama3
+openai_api = openai|https://api.openai.com/v1|YOUR_API_KEY|gpt-4
 ```
 
-**Docker ne démarre pas:**
-```bash
-# Vérifier Docker
-docker --version
-docker-compose --version
+### Architecture de Stockage Locale
 
-# Redémarrer Docker
-sudo systemctl restart docker  # Linux
-# Redémarrer Docker Desktop    # Windows/macOS
-```
+**Base de données utilisateurs** : `user_auth.db` (SQLite)
+**Prompts système** : `prompts.json` (JSON)
+**Prompts utilisateur** : `user_prompts.json` (JSON)
+**Fichiers uploadés** : `backend/uploaded_files/` (Système de fichiers)
 
-**MongoDB inaccessible:**
-```bash
-# Vérifier le service
-docker-compose logs mongodb
+### Avantages de cette Architecture
 
-# Redémarrer MongoDB
-docker-compose restart mongodb
-```
-
-**Erreurs de permissions:**
-```bash
-# Linux - Ajouter utilisateur au groupe docker
-sudo usermod -aG docker $USER
-newgrp docker
-```
-
-### Support et Logs
-
-```bash
-# Logs détaillés
-docker-compose logs -f --tail=100
-
-# Accès aux conteneurs
-docker-compose exec backend bash
-docker-compose exec mongodb mongosh
-
-# Nettoyage
-make clean
-```
-
-## 📚 Documentation
-
-- **📖 Guide d'installation**: [INSTALLATION.md](INSTALLATION.md)
-- **🔧 Configuration**: [config.ini.template](config.ini.template)
-- **🤖 API Documentation**: http://localhost:8001/docs
-- **📊 Architecture**: Voir diagrammes ci-dessus
-
-## 🤝 Contribution
-
-1. Fork le projet
-2. Créez une branche feature (`git checkout -b feature/amazing-feature`)
-3. Committez vos changements (`git commit -m 'Add amazing feature'`)
-4. Poussez vers la branche (`git push origin feature/amazing-feature`)
-5. Ouvrez une Pull Request
-
-## 📄 Licence
-
-Ce projet est sous licence MIT. Voir `LICENSE` pour plus de détails.
-
-## 🆘 Support
-
-- **Issues**: Utilisez le système d'issues GitHub
-- **Email**: contact@votre-entreprise.fr
-- **Documentation**: Ce README et [INSTALLATION.md](INSTALLATION.md)
-
----
-
-**Développé avec ❤️ pour optimiser les processus d'achat avec l'IA**
-
-🚀 **Prêt à révolutionner vos achats avec l'IA ? Lancez `make install` !**
+- ✅ **Pas de MongoDB** - Installation simplifiée
+- ✅ **Pas de Docker** - Fonctionne directement sur Windows
+- ✅ **Pas de droits admin** - Installation utilisateur via Conda
+- ✅ **Démarrage rapide** - Scripts batch automatiques
+- ✅ **Maintenance facile** - Fichiers locaux visibles
+- ✅ **Scripts organisés** - Tous dans le répertoire `windows/`

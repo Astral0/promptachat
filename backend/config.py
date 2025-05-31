@@ -16,48 +16,129 @@ class Config:
         
     def _find_config_file(self) -> str:
         """Find configuration file in order of preference."""
+        # Get the current directory (backend) and parent directory (project root)
+        current_dir = Path(__file__).parent
+        project_root = current_dir.parent
+        
         possible_paths = [
             os.environ.get('PROMPTACHAT_CONFIG'),
+            # Docker environment paths (for backward compatibility)
             '/app/config.ini',
-            '/app/config.ini.template',
+            # Local development paths (Windows/Linux compatible)
+            str(project_root / 'config.ini'),
+            str(current_dir / 'config.ini'),
+            str(project_root / 'config.ini.template'),
+            str(current_dir / 'config.ini.template'),
+            # Fallback relative paths
+            '../config.ini',
             './config.ini',
+            '../config.ini.template',
             './config.ini.template'
         ]
         
         for path in possible_paths:
             if path and Path(path).exists():
-                return path
+                logger.info(f"Found config file at: {path}")
+                return str(Path(path).resolve())
                 
         # Create default config if none found
-        default_path = '/app/config.ini'
-        self._create_default_config(default_path)
-        return default_path
+        # Try project root first, then current directory
+        default_path = project_root / 'config.ini'
+        template_path = project_root / 'config.ini.template'
+        
+        # If we can't write to project root, use current directory
+        try:
+            default_path.parent.mkdir(parents=True, exist_ok=True)
+            default_path.touch()
+            default_path.unlink()  # Just testing write permission
+        except (PermissionError, OSError):
+            default_path = current_dir / 'config.ini'
+            template_path = current_dir / 'config.ini.template'
+        
+        self._create_default_config(str(default_path), str(template_path))
+        return str(default_path)
     
-    def _create_default_config(self, path: str):
+    def _create_default_config(self, path: str, template_path: str = None):
         """Create default configuration file."""
         logger.warning(f"No config file found, creating default at {path}")
-        template_path = '/app/config.ini.template'
-        if Path(template_path).exists():
-            import shutil
-            shutil.copy(template_path, path)
-        else:
-            # Create minimal config
-            with open(path, 'w') as f:
+        
+        # Try to copy from template first
+        if template_path and Path(template_path).exists():
+            try:
+                import shutil
+                shutil.copy(template_path, path)
+                logger.info(f"Copied template from {template_path} to {path}")
+                return
+            except Exception as e:
+                logger.warning(f"Could not copy template: {e}")
+        
+        # Create minimal config if template not available
+        try:
+            with open(path, 'w', encoding='utf-8') as f:
                 f.write("""[app]
 name = edf
-title = PromptAchat
+title = PromptAchat - Bibliothèque de Prompts EDF
+logo_url = https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/EDF_logo.svg/1200px-EDF_logo.svg.png
+access_contact_email = contact@edf.fr
+session_timeout = 3600
 
 [database]
+user_auth_db_path = user_auth.db
 prompts_db_name = promptachat_db
 
+[file_storage]
+storage_type = filesystem
+base_directory = uploaded_files
+max_file_size_mb = 10
+allowed_extensions = pdf
+cleanup_temp_files = true
+keep_file_days = 365
+
+[llm_servers]
+# Format: server_name = type|url|api_key|default_model
+# Types supportés: ollama, openai
+server1 = ollama|http://localhost:11434|none|llama3
+
 [ollama]
-enabled = true
+enabled = false
 url = http://localhost:11434/v1
 default_model = llama3
 
+[llm]
+default_temperature = 0.7
+max_tokens = 4096
+timeout = 120
+
+[ldap]
+enabled = false
+server = ldap.example.com
+port = 389
+user_dn_format = uid=%%s,ou=people,dc=example,dc=com
+use_ssl = false
+base_dn = dc=example,dc=com
+
+[security]
+initial_admin_uids = admin,admin1,admin2
+jwt_secret_key = CHANGEZ_MOI_EN_PRODUCTION
+jwt_algorithm = HS256
+jwt_expire_minutes = 60
+
 [logging]
 default_level = INFO
+max_log_size = 10MB
+backup_count = 5
+
+[features]
+enable_privacy_check = true
+enable_deep_linking = true
+enable_pdf_upload = true
+enable_cockpit_integration = true
+max_file_size_mb = 10
 """)
+            logger.info(f"Created minimal config at {path}")
+        except Exception as e:
+            logger.error(f"Could not create config file: {e}")
+            raise
     
     def _load_config(self):
         """Load configuration from file."""

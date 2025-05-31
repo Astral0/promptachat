@@ -3,7 +3,6 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
@@ -13,6 +12,7 @@ from datetime import datetime
 import json
 import PyPDF2
 import io
+import shutil
 
 from models import (
     User, UserLogin, Token, UserCreate, UserUpdate,
@@ -26,11 +26,9 @@ from config import get_app_config, get_database_config
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db_config = get_database_config()
-db = client[os.environ.get('DB_NAME', db_config['prompts_db_name'])]
+# Initialize file storage directory
+FILES_DIR = ROOT_DIR / "uploaded_files"
+FILES_DIR.mkdir(exist_ok=True)
 
 # Initialize services
 auth_service = AuthService()
@@ -405,6 +403,20 @@ async def update_user_preferences(
 # File Upload Routes
 # ===============================
 
+def _save_file_metadata(file_id: str, metadata: dict):
+    """Save file metadata to JSON file."""
+    metadata_file = FILES_DIR / f"{file_id}_metadata.json"
+    with open(metadata_file, 'w') as f:
+        json.dump(metadata, f, indent=2, default=str)
+
+def _load_file_metadata(file_id: str) -> Optional[dict]:
+    """Load file metadata from JSON file."""
+    metadata_file = FILES_DIR / f"{file_id}_metadata.json"
+    if metadata_file.exists():
+        with open(metadata_file, 'r') as f:
+            return json.load(f)
+    return None
+
 @api_router.post("/files/upload")
 async def upload_file(
     file: UploadFile = File(...),
@@ -427,18 +439,22 @@ async def upload_file(
         
         file_id = str(uuid.uuid4())
         
-        # Store in MongoDB (optional - for now just return the text)
-        file_doc = {
+        # Store file in file system
+        file_path = FILES_DIR / f"{file_id}.pdf"
+        with open(file_path, 'wb') as f:
+            f.write(content)
+        
+        # Save metadata
+        metadata = {
             "id": file_id,
             "filename": file.filename,
             "content_type": file.content_type,
             "size": len(content),
             "extracted_text": extracted_text,
             "uploaded_by": current_user.id,
-            "uploaded_at": datetime.utcnow()
+            "uploaded_at": datetime.utcnow().isoformat()
         }
-        
-        await db.files.insert_one(file_doc)
+        _save_file_metadata(file_id, metadata)
         
         return {
             "id": file_id,
@@ -450,6 +466,113 @@ async def upload_file(
     except Exception as e:
         logger.error(f"File upload error: {e}")
         raise HTTPException(status_code=500, detail="Erreur lors du traitement du fichier")
+
+@api_router.get("/files/{file_id}")
+async def get_file_info(
+    file_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get file information and metadata."""
+    metadata = _load_file_metadata(file_id)
+    if not metadata:
+        raise HTTPException(status_code=404, detail="Fichier non trouvé")
+    
+    # Check if user has access (own file or admin)
+    if metadata["uploaded_by"] != current_user.id and current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Accès non autorisé")
+    
+    return metadata
+
+@api_router.get("/files/{file_id}/download")
+async def download_file(
+    file_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Download the original PDF file."""
+    metadata = _load_file_metadata(file_id)
+    if not metadata:
+        raise HTTPException(status_code=404, detail="Fichier non trouvé")
+    
+    # Check if user has access
+    if metadata["uploaded_by"] != current_user.id and current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Accès non autorisé")
+    
+    file_path = FILES_DIR / f"{file_id}.pdf"
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="Fichier physique non trouvé")
+    
+    return {"download_url": f"/api/files/{file_id}/raw"}
+
+@api_router.get("/files/{file_id}/raw")
+async def get_raw_file(
+    file_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get raw file content."""
+    metadata = _load_file_metadata(file_id)
+    if not metadata:
+        raise HTTPException(status_code=404, detail="Fichier non trouvé")
+    
+    # Check if user has access
+    if metadata["uploaded_by"] != current_user.id and current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Accès non autorisé")
+    
+    file_path = FILES_DIR / f"{file_id}.pdf"
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="Fichier physique non trouvé")
+    
+    def file_generator():
+        with open(file_path, 'rb') as f:
+            yield from f
+    
+    return StreamingResponse(
+        file_generator(),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={metadata['filename']}"}
+    )
+
+@api_router.get("/files")
+async def list_user_files(current_user: User = Depends(get_current_user)):
+    """List all files uploaded by the current user."""
+    user_files = []
+    
+    # Scan files directory for user's files
+    for metadata_file in FILES_DIR.glob("*_metadata.json"):
+        metadata = _load_file_metadata(metadata_file.stem.replace("_metadata", ""))
+        if metadata and metadata["uploaded_by"] == current_user.id:
+            user_files.append({
+                "id": metadata["id"],
+                "filename": metadata["filename"],
+                "size": metadata["size"],
+                "uploaded_at": metadata["uploaded_at"]
+            })
+    
+    return {"files": user_files}
+
+@api_router.delete("/files/{file_id}")
+async def delete_file(
+    file_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Delete a file."""
+    metadata = _load_file_metadata(file_id)
+    if not metadata:
+        raise HTTPException(status_code=404, detail="Fichier non trouvé")
+    
+    # Check if user has access
+    if metadata["uploaded_by"] != current_user.id and current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Accès non autorisé")
+    
+    # Delete files
+    file_path = FILES_DIR / f"{file_id}.pdf"
+    metadata_path = FILES_DIR / f"{file_id}_metadata.json"
+    
+    if file_path.exists():
+        file_path.unlink()
+    if metadata_path.exists():
+        metadata_path.unlink()
+    
+    return {"message": "Fichier supprimé avec succès"}
 
 # ===============================
 # User Management Routes (Admin)
@@ -554,4 +677,4 @@ logger = logging.getLogger(__name__)
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
-    client.close()
+    pass
