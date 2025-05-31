@@ -14,14 +14,14 @@ import json
 import PyPDF2
 import io
 
-from .models import (
+from models import (
     User, UserLogin, Token, UserCreate, UserUpdate,
     UserPrompt, UserPromptCreate, UserPromptUpdate,
     ChatRequest, LLMRequest, PromptExecutionResult,
     LLMServerConfig, LLMServerTest, UserPreferences
 )
-from .services import AuthService, PromptService, LLMService
-from .config import get_app_config, get_database_config
+from services import AuthService, PromptService, LLMService
+from config import get_app_config, get_database_config
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -150,7 +150,7 @@ async def search_prompts(
     user_id = current_user.id if current_user else None
     prompt_type = None
     if type in ['internal', 'external']:
-        from .models import PromptType
+        from models import PromptType
         prompt_type = PromptType(type)
     
     return prompt_service.search_prompts(q, user_id, category, prompt_type)

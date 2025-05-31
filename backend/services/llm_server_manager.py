@@ -1,12 +1,12 @@
+import logging
+import aiohttp
 import asyncio
 import time
 from typing import Dict, List, Optional
-import aiohttp
-import logging
 from datetime import datetime
 
-from ..config import config
-from ..models import LLMServerConfig, LLMServerTest
+from config import config
+from models import LLMServerConfig, LLMServerTest
 
 logger = logging.getLogger(__name__)
 

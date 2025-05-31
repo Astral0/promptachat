@@ -1,11 +1,16 @@
-import sqlite3
 import hashlib
 import secrets
-from datetime import datetime, timedelta
-from typing import Optional, Dict, Any
 import jwt
-import logging
+from datetime import datetime, timedelta
 from pathlib import Path
+import sqlite3
+import logging
+from typing import Optional, List, Dict, Any
+import os
+import json
+
+from config import get_auth_config, get_database_config
+from models import User, UserRole
 
 try:
     import ldap3
@@ -13,9 +18,6 @@ try:
 except ImportError:
     LDAP_AVAILABLE = False
     logging.warning("LDAP3 not available. LDAP authentication disabled.")
-
-from ..config import get_auth_config, get_database_config
-from ..models import User, UserRole
 
 logger = logging.getLogger(__name__)
 

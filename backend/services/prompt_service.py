@@ -5,11 +5,11 @@ from typing import List, Optional, Dict, Any
 from pathlib import Path
 import logging
 
-from ..models import (
+from models import (
     SystemPrompt, UserPrompt, UserPromptCreate, UserPromptUpdate,
     PromptType
 )
-from ..config import config
+from config import config
 
 logger = logging.getLogger(__name__)
 

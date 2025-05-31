@@ -39,7 +39,7 @@ services:
       - ./config.ini:/app/config.ini:ro
       - ./prompts.json:/app/prompts.json:ro
       - user_prompts_data:/app/user_prompts.json
-      - user_auth_data:/app/user_auth.db
+      - user_auth_data:/app/data
       - backend_logs:/app/logs
     ports:
       - "8001:8001"

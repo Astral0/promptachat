@@ -4,3 +4,5 @@ from .llm_service import LLMService
 from .llm_server_manager import LLMServerManager
 
 __all__ = ['AuthService', 'PromptService', 'LLMService', 'LLMServerManager']
+
+# Services package
