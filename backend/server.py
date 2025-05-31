@@ -14,14 +14,14 @@ import PyPDF2
 import io
 import shutil
 
-from models import (
+from backend.models import (
     User, UserLogin, Token, UserCreate, UserUpdate,
     UserPrompt, UserPromptCreate, UserPromptUpdate,
     ChatRequest, LLMRequest, PromptExecutionResult,
     LLMServerConfig, LLMServerTest, UserPreferences
 )
-from services import AuthService, PromptService, LLMService
-from config import get_app_config, get_database_config
+from backend.services import AuthService, PromptService, LLMService
+from backend.config import get_app_config, get_database_config
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
