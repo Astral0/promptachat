@@ -19,6 +19,12 @@ if errorlevel 1 (
 
 echo [OK] npm trouve
 cd /d "%~dp0..\frontend"
+
+rem Configuration de l'URL du backend pour l'environnement local
+set REACT_APP_BACKEND_URL=http://localhost:8001
+echo [CONFIG] Backend URL: %REACT_APP_BACKEND_URL%
+
 echo [INFO] Demarrage de React sur http://localhost:3000
 npm start
 pause 
+cd ..\\windows

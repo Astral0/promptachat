@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import List, Optional, Dict, Any
 from pathlib import Path
 import logging
+import os
 
 from models import (
     SystemPrompt, UserPrompt, UserPromptCreate, UserPromptUpdate,
@@ -17,10 +18,34 @@ class PromptService:
     """Service for managing system and user prompts."""
     
     def __init__(self):
-        self.system_prompts_file = '/app/prompts.json'
-        self.user_prompts_file = '/app/user_prompts.json'
+        # Détection automatique de l'environnement
+        self._setup_file_paths()
         self._ensure_user_prompts_file()
         
+    def _setup_file_paths(self):
+        """Configure les chemins des fichiers selon l'environnement (Docker vs Windows local)."""
+        # Vérifier si on est dans un environnement Docker
+        is_docker = (
+            os.path.exists('/app/config.ini') or 
+            os.environ.get('DOCKER_ENV') == 'true' or
+            os.path.exists('/.dockerenv')
+        )
+        
+        if is_docker:
+            # Chemins Docker
+            self.system_prompts_file = '/app/prompts.json'
+            self.user_prompts_file = '/app/user_prompts.json'
+            logger.info("PromptService configuré pour l'environnement Docker")
+        else:
+            # Chemins pour environnement local (Windows/Linux)
+            # Le backend tourne depuis backend/, donc remonter d'un niveau
+            project_root = Path(__file__).parent.parent.parent
+            self.system_prompts_file = str(project_root / 'prompts.json')
+            self.user_prompts_file = str(project_root / 'user_prompts.json')
+            logger.info(f"PromptService configuré pour l'environnement local")
+            logger.info(f"Fichier système: {self.system_prompts_file}")
+            logger.info(f"Fichier utilisateur: {self.user_prompts_file}")
+    
     def _ensure_user_prompts_file(self):
         """Ensure user prompts file exists."""
         if not Path(self.user_prompts_file).exists():

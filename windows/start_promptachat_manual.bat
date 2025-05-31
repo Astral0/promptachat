@@ -42,7 +42,7 @@ echo [ETAPE 4] Attente du demarrage du backend (10 secondes)...
 ping 127.0.0.1 -n 11 > nul
 
 echo [ETAPE 5] Lancement du frontend...
-start "PromptAchat Frontend" cmd /k "call conda activate promptachat && cd /d %~dp0..\frontend && npm start"
+start "PromptAchat Frontend" cmd /k "call conda activate promptachat && cd /d %~dp0..\frontend && set REACT_APP_BACKEND_URL=http://localhost:8001 && npm start"
 
 echo.
 echo [SUCCESS] PromptAchat est en cours de demarrage !
@@ -58,3 +58,4 @@ echo   Mot de passe : admin
 echo.
 echo [ATTENTION] Fermez cette fenetre pour arreter les services
 pause 
+cd ..\\windows

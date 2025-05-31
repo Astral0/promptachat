@@ -27,8 +27,34 @@ class AuthService:
     def __init__(self):
         self.auth_config = get_auth_config()
         self.db_config = get_database_config()
-        self.db_path = self.db_config['user_auth_db_path']
+        
+        # Détection automatique de l'environnement pour le chemin de la base de données
+        self._setup_database_path()
         self._init_local_db()
+        
+    def _setup_database_path(self):
+        """Configure le chemin de la base de données selon l'environnement (Docker vs Windows local)."""
+        # Vérifier si on est dans un environnement Docker
+        is_docker = (
+            os.path.exists('/app/config.ini') or 
+            os.environ.get('DOCKER_ENV') == 'true' or
+            os.path.exists('/.dockerenv')
+        )
+        
+        if is_docker:
+            # Utiliser le chemin configuré (Docker)
+            self.db_path = self.db_config['user_auth_db_path']
+            logger.info(f"AuthService configuré pour l'environnement Docker: {self.db_path}")
+        else:
+            # Environnement local (Windows/Linux) - utiliser le fichier à la racine du projet
+            project_root = Path(__file__).parent.parent.parent
+            self.db_path = str(project_root / 'user_auth.db')
+            logger.info(f"AuthService configuré pour l'environnement local: {self.db_path}")
+            
+            # Vérifier si le fichier existe, sinon le créer
+            if not Path(self.db_path).exists():
+                logger.info(f"Création du fichier de base de données: {self.db_path}")
+                Path(self.db_path).touch()
         
     def _init_local_db(self):
         """Initialize local SQLite database for user management."""
