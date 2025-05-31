@@ -5,7 +5,7 @@ import time
 from typing import Dict, List, Optional
 from datetime import datetime
 
-from config import config
+from backend.config import config
 from models import LLMServerConfig, LLMServerTest
 
 logger = logging.getLogger(__name__)
