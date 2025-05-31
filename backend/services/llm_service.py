@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, AsyncGenerator, Any
 from datetime import datetime
 import re
 
-from config import get_llm_config, get_features_config
+from backend.config import get_llm_config, get_features_config
 from models import LLMRequest, LLMResponse, ConfidentialityLevel
 from .llm_server_manager import LLMServerManager
 
