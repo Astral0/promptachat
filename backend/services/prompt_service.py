@@ -10,7 +10,7 @@ from models import (
     SystemPrompt, UserPrompt, UserPromptCreate, UserPromptUpdate,
     PromptType
 )
-from config import config
+from backend.config import config
 
 logger = logging.getLogger(__name__)
 
