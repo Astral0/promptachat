@@ -6,7 +6,7 @@ from pathlib import Path
 import logging
 import os
 
-from models import (
+from backend.models import (
     SystemPrompt, UserPrompt, UserPromptCreate, UserPromptUpdate,
     PromptType
 )
