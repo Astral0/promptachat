@@ -9,7 +9,7 @@ from typing import Optional, List, Dict, Any
 import os
 import json
 
-from config import get_auth_config, get_database_config
+from backend.config import get_auth_config, get_database_config
 from models import User, UserRole
 
 try:
