@@ -1,0 +1,22 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install dependencies for development
+RUN apk add --no-cache git
+
+# Copy package files
+COPY package.json yarn.lock ./
+
+# Install all dependencies (including dev)
+RUN yarn install --frozen-lockfile
+
+# Set development environment
+ENV NODE_ENV=development
+ENV CHOKIDAR_USEPOLLING=true
+
+# Expose port
+EXPOSE 3000
+
+# Default command (can be overridden)
+CMD ["yarn", "start"]
