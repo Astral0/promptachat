@@ -6,7 +6,7 @@ import time
 from datetime import datetime
 
 class PromptAchatTester:
-    def __init__(self, base_url="https://47726854-5ab9-4327-9c22-c9b51596b3d1.preview.emergentagent.com"):
+    def __init__(self, base_url="https://2444bfad-255e-4dce-94ef-e2848c1c1958.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.token = None
