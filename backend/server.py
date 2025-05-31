@@ -148,7 +148,7 @@ async def search_prompts(
     user_id = current_user.id if current_user else None
     prompt_type = None
     if type in ['internal', 'external']:
-        from models import PromptType
+        from backend.models import PromptType
         prompt_type = PromptType(type)
     
     return prompt_service.search_prompts(q, user_id, category, prompt_type)
