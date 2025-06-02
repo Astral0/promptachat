@@ -974,7 +974,7 @@ async def validate_prompt_execution(
         raise HTTPException(status_code=404, detail="Prompt non trouvé")
     
     # Validate variables
-    validation = prompt_execution_service.validate_variables(prompt.content, variables)
+    validation = prompt_execution_service.validate_variables(prompt['content'], variables)
     
     return validation
 
