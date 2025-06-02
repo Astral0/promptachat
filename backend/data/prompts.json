@@ -292,6 +292,299 @@
       "variables": [],
       "uses_cockpit_data": false,
       "is_system": true
+    },
+    {
+      "id": "internal_1",
+      "title": "Analyse de Performance Fournisseur Avancée",
+      "category": "Évaluation Fournisseur",
+      "description": "Analyse détaillée des performances d'un fournisseur sur plusieurs critères avec recommandations d'amélioration.",
+      "content": "Vous êtes un expert en évaluation fournisseur. Analysez en détail les performances du fournisseur avec les informations suivantes :\n\n**Informations Cockpit :**\n- Entreprise : {nom_entreprise}\n- Secteur : {secteur_activite}\n- Fournisseur évalué : {fournisseur_principal}\n- Période d'évaluation : {date_analyse}\n\n**Critères d'évaluation :**\n1. **Qualité des produits/services** (pondération 30%)\n2. **Respect des délais** (pondération 25%)\n3. **Compétitivité tarifaire** (pondération 20%)\n4. **Service client et réactivité** (pondération 15%)\n5. **Innovation et amélioration continue** (pondération 10%)\n\nPour chaque critère, fournissez :\n- Une note sur 5\n- Une justification détaillée\n- Des recommandations spécifiques d'amélioration\n- Des actions correctives si nécessaire\n\n**Synthèse demandée :**\n- Note globale pondérée\n- Forces principales du fournisseur\n- Axes d'amélioration prioritaires\n- Recommandations pour la suite de la relation\n- Plan d'action avec échéances",
+      "type": "internal",
+      "variables": [
+        "nom_entreprise",
+        "secteur_activite",
+        "fournisseur_principal",
+        "date_analyse"
+      ],
+      "uses_cockpit_data": true,
+      "is_system": true
+    },
+    {
+      "id": "internal_2",
+      "title": "Audit de Conformité RSE Fournisseur",
+      "category": "RSE et Développement Durable",
+      "description": "Audit complet de la conformité RSE d'un fournisseur avec grille d'évaluation détaillée.",
+      "content": "En tant qu'expert en RSE et développement durable, conduisez un audit de conformité RSE pour notre fournisseur.\n\n**Contexte entreprise :**\n- Entreprise : {nom_entreprise}\n- Secteur : {secteur_activite}\n- Politique RSE : {politique_rse}\n- Objectifs développement durable : {objectifs_dev_durable}\n\n**Fournisseur à auditer :**\n- Nom : {fournisseur_principal}\n- Activité principale : [À préciser]\n- Localisation : [À préciser]\n\n**Axes d'audit RSE :**\n\n1. **Environnement**\n   - Certifications ISO 14001, ISO 50001\n   - Politique de réduction carbone\n   - Gestion des déchets et recyclage\n   - Utilisation d'énergies renouvelables\n\n2. **Social et conditions de travail**\n   - Respect des droits humains\n   - Conditions de travail et sécurité\n   - Diversité et inclusion\n   - Formation et développement des employés\n\n3. **Gouvernance et éthique**\n   - Code de conduite et éthique\n   - Lutte contre la corruption\n   - Transparence et reporting\n   - Gestion des parties prenantes\n\n4. **Impact local et sociétal**\n   - Contribution au développement local\n   - Partenariats avec des acteurs locaux\n   - Initiatives communautaires\n\n**Livrable attendu :**\n- Évaluation détaillée par axe (note /10)\n- Points forts et non-conformités identifiées\n- Plan d'amélioration avec priorités\n- Recommandations de suivi et contrôle",
+      "type": "internal",
+      "variables": [
+        "nom_entreprise",
+        "secteur_activite",
+        "politique_rse",
+        "objectifs_dev_durable",
+        "fournisseur_principal"
+      ],
+      "uses_cockpit_data": true,
+      "is_system": true
+    },
+    {
+      "id": "internal_3",
+      "title": "Stratégie de Négociation Adaptée",
+      "category": "Négociation",
+      "description": "Élaboration d'une stratégie de négociation personnalisée selon le contexte et les enjeux.",
+      "content": "Vous êtes un expert en négociation commerciale. Développez une stratégie de négociation adaptée à notre contexte.\n\n**Profil entreprise :**\n- Entreprise : {nom_entreprise}\n- Budget achats annuel : {budget_achats_annuel}\n- Stratégie négociation actuelle : {strategie_negociation}\n- Délai paiement standard : {delai_paiement_std}\n\n**Contexte de négociation :**\n- Type d'achat : [À préciser]\n- Montant approximatif : [À préciser]\n- Enjeux critiques : [À préciser]\n- Contraintes temporelles : [À préciser]\n\n**Analyse préparatoire :**\n\n1. **Analyse du rapport de force**\n   - Position de l'acheteur\n   - Dépendance mutuelle\n   - Alternatives disponibles (BATNA)\n\n2. **Objectifs et limites**\n   - Objectifs optimaux, acceptables et de rupture\n   - Variables négociables (prix, délais, qualité, services...)\n   - Contraintes non négociables\n\n3. **Profil fournisseur**\n   - Motivations et contraintes du fournisseur\n   - Historique relationnel\n   - Leviers d'influence\n\n**Stratégie recommandée :**\n- Approche négociation (compétitive/collaborative)\n- Séquencement des étapes\n- Arguments et contre-arguments\n- Tactiques spécifiques\n- Plan B en cas d'échec\n\n**Kit de négociation :**\n- Scripts de négociation par phase\n- Objections probables et réponses\n- Indicateurs de suivi en temps réel",
+      "type": "internal",
+      "variables": [
+        "nom_entreprise",
+        "budget_achats_annuel",
+        "strategie_negociation",
+        "delai_paiement_std"
+      ],
+      "uses_cockpit_data": true,
+      "is_system": true
+    },
+    {
+      "id": "internal_4",
+      "title": "Analyse de Risque Fournisseur Multi-Critères",
+      "category": "Gestion des Risques",
+      "description": "Évaluation complète des risques associés à un fournisseur avec matrice de criticité.",
+      "content": "En tant qu'expert en gestion des risques fournisseurs, effectuez une analyse de risque complète.\n\n**Contexte organisationnel :**\n- Entreprise : {nom_entreprise}\n- Secteur d'activité : {secteur_activite}\n- Niveau de risque fournisseur actuel : {niveau_risque_fournisseur}\n- Procédures d'audit : {procedures_audit}\n\n**Fournisseur à analyser :**\n- Nom : {fournisseur_principal}\n- Criticité pour l'activité : [À préciser]\n- Montant annuel : [À préciser]\n\n**Dimensions d'analyse des risques :**\n\n1. **Risques financiers**\n   - Stabilité financière\n   - Solvabilité et liquidité\n   - Dépendance économique\n\n2. **Risques opérationnels**\n   - Capacité de production\n   - Qualité et conformité\n   - Délais et fiabilité de livraison\n\n3. **Risques stratégiques**\n   - Dépendance mutuelle\n   - Concentration du portefeuille\n   - Évolution du marché\n\n4. **Risques géopolitiques et réglementaires**\n   - Stabilité pays/région\n   - Évolution réglementaire\n   - Contraintes import/export\n\n5. **Risques ESG**\n   - Conformité environnementale\n   - Pratiques sociales\n   - Gouvernance et éthique\n\n6. **Risques technologiques et cyber**\n   - Sécurité informatique\n   - Protection des données\n   - Continuité numérique\n\n**Évaluation et plan d'action :**\n- Matrice de criticité (probabilité x impact)\n- Cartographie des risques prioritaires\n- Mesures de mitigation pour chaque risque\n- Plan de continuité d'activité\n- Indicateurs de surveillance (KRI)\n- Fréquence de réévaluation recommandée",
+      "type": "internal",
+      "variables": [
+        "nom_entreprise",
+        "secteur_activite",
+        "niveau_risque_fournisseur",
+        "procedures_audit",
+        "fournisseur_principal"
+      ],
+      "uses_cockpit_data": true,
+      "is_system": true
+    },
+    {
+      "id": "internal_5",
+      "title": "Optimisation des Processus Achats",
+      "category": "Stratégie Achats",
+      "description": "Analyse et recommandations pour optimiser les processus achats de l'organisation.",
+      "content": "Vous êtes un consultant expert en optimisation des processus achats. Analysez nos processus actuels et proposez des améliorations.\n\n**Configuration actuelle :**\n- Entreprise : {nom_entreprise}\n- Taille : {nb_employees} employés\n- Budget achats : {budget_achats_annuel}\n- Système ERP : {systeme_erp}\n- Outils achats : {outils_achats}\n\n**Processus actuels :**\n- Processus de validation : {processus_validation}\n- Workflows d'approbation : {workflows_approbation}\n- Seuils d'approbation : {seuils_approbation}\n- Nombre de fournisseurs actifs : {nb_fournisseurs_actifs}\n\n**Axes d'analyse :**\n\n1. **Efficacité opérationnelle**\n   - Temps de cycle des processus\n   - Niveau d'automatisation\n   - Points de friction identifiés\n   - Charge de travail équipes\n\n2. **Gouvernance et contrôle**\n   - Respect des procédures\n   - Séparation des tâches\n   - Traçabilité des décisions\n   - Gestion des exceptions\n\n3. **Performance économique**\n   - Taux de conformité budgétaire\n   - Économies réalisées\n   - Coût du processus achats\n   - ROI des initiatives\n\n4. **Gestion fournisseurs**\n   - Rationalisation du panel\n   - Évaluation et développement\n   - Relations partenariales\n   - Innovation collaborative\n\n5. **Outils et digitalisation**\n   - Couverture fonctionnelle\n   - Intégration des systèmes\n   - Automatisation possible\n   - Expérience utilisateur\n\n**Recommandations attendues :**\n- Cartographie des processus optimisés\n- Plan de transformation avec priorités\n- Bénéfices quantifiés attendus\n- Ressources et budget nécessaires\n- Planning de mise en œuvre\n- Indicateurs de succès (KPI)",
+      "type": "internal",
+      "variables": [
+        "nom_entreprise",
+        "nb_employees",
+        "budget_achats_annuel",
+        "systeme_erp",
+        "outils_achats",
+        "processus_validation",
+        "workflows_approbation",
+        "seuils_approbation",
+        "nb_fournisseurs_actifs"
+      ],
+      "uses_cockpit_data": true,
+      "is_system": true
+    },
+    {
+      "id": "internal_6",
+      "title": "Tableau de Bord Achats Personnalisé",
+      "category": "Reporting et Analyse",
+      "description": "Conception d'un tableau de bord achats adapté aux besoins spécifiques de l'organisation.",
+      "content": "En tant qu'expert en pilotage de la performance achats, concevez un tableau de bord adapté à notre organisation.\n\n**Profil organisation :**\n- Entreprise : {nom_entreprise}\n- Secteur : {secteur_activite}\n- Budget achats : {budget_achats_annuel}\n- KPI actuels : {kpi_achats}\n- Fréquence reporting : {frequence_reporting}\n\n**Objectifs stratégiques :**\n- Objectifs réduction coûts : {objectifs_reduction_couts}\n- Focus sur : [À préciser selon contexte]\n\n**Dimensions du tableau de bord :**\n\n1. **Performance financière**\n   - Économies réalisées vs objectifs\n   - Évolution des prix d'achat\n   - Respect budgétaire par catégorie\n   - Coût total d'acquisition (TCO)\n   - ROI des initiatives achats\n\n2. **Performance opérationnelle**\n   - Taux de service fournisseurs\n   - Délais de cycle des processus\n   - Qualité des livraisons\n   - Taux de conformité\n   - Productivité équipes achats\n\n3. **Gestion fournisseurs**\n   - Nombre de fournisseurs actifs/nouveaux\n   - Concentration du panel\n   - Performance fournisseurs (score global)\n   - Taux de renouvellement contrats\n   - Satisfaction fournisseurs\n\n4. **Risques et conformité**\n   - Exposition aux risques\n   - Taux d'audits réalisés\n   - Non-conformités détectées\n   - Couverture assurance\n   - Score ESG moyen du panel\n\n5. **Innovation et développement**\n   - Projets d'innovation en cours\n   - Économies process vs produit\n   - Partenariats stratégiques\n   - Nouvelles technologies adoptées\n\n**Spécifications techniques :**\n- Fréquence de mise à jour recommandée\n- Sources de données nécessaires\n- Niveaux d'accès et diffusion\n- Alertes et seuils critiques\n- Format de présentation (dashboard, rapport...)\n- Intégration avec systèmes existants\n\n**Plan de mise en œuvre :**\n- Phases de déploiement\n- Ressources nécessaires\n- Formation des utilisateurs\n- Planning de déploiement",
+      "type": "internal",
+      "variables": [
+        "nom_entreprise",
+        "secteur_activite",
+        "budget_achats_annuel",
+        "kpi_achats",
+        "frequence_reporting",
+        "objectifs_reduction_couts"
+      ],
+      "uses_cockpit_data": true,
+      "is_system": true
+    },
+    {
+      "id": "internal_7",
+      "title": "Plan de Continuité Fournisseurs",
+      "category": "Gestion des Risques",
+      "description": "Élaboration d'un plan de continuité d'activité centré sur la gestion des risques fournisseurs.",
+      "content": "Vous êtes un expert en continuité d'activité. Élaborez un plan de continuité spécifique à la gestion des risques fournisseurs.\n\n**Contexte entreprise :**\n- Organisation : {nom_entreprise}\n- Secteur : {secteur_activite}\n- Localisation : {pays_siege}, {ville_siege}\n- Plan continuité existant : {plan_continuite}\n\n**Portefeuille fournisseurs :**\n- Fournisseurs actifs : {nb_fournisseurs_actifs}\n- Fournisseur principal : {fournisseur_principal}\n- Catégories d'achats : {categories_achats}\n\n**Éléments du plan de continuité :**\n\n1. **Analyse d'impact Business (BIA)**\n   - Identification des fournisseurs critiques\n   - Cartographie des dépendances\n   - Évaluation des impacts par scénario\n   - Définition des seuils de criticité\n\n2. **Scénarios de risque**\n   - Défaillance fournisseur unique\n   - Perturbation géographique/sectorielle\n   - Crise systémique (pandémie, conflit...)\n   - Cyberattaque fournisseur critique\n   - Rupture de la chaîne logistique\n\n3. **Stratégies de mitigation**\n   - Diversification des sources\n   - Stocks de sécurité stratégiques\n   - Contrats de backup\n   - Clauses contractuelles spécifiques\n   - Partenariats d'urgence\n\n4. **Procédures d'activation**\n   - Déclencheurs et seuils d'alerte\n   - Escalade et prise de décision\n   - Communications internes/externes\n   - Activation des solutions de secours\n   - Coordination avec les fournisseurs\n\n5. **Gestion de crise**\n   - Cellule de crise achats\n   - Tableau de bord de suivi temps réel\n   - Communication avec les parties prenantes\n   - Documentation des actions\n   - Retour d'expérience\n\n**Plan de mise en œuvre :**\n- Organisation et responsabilités\n- Formation des équipes\n- Tests et exercices de simulation\n- Mise à jour et révision régulière\n- Indicateurs de performance du plan\n\n**Kit de déploiement :**\n- Matrice de criticité fournisseurs\n- Procédures détaillées par scénario\n- Contacts d'urgence\n- Modèles de communication\n- Outils de suivi et reporting",
+      "type": "internal",
+      "variables": [
+        "nom_entreprise",
+        "secteur_activite",
+        "pays_siege",
+        "ville_siege",
+        "plan_continuite",
+        "nb_fournisseurs_actifs",
+        "fournisseur_principal",
+        "categories_achats"
+      ],
+      "uses_cockpit_data": true,
+      "is_system": true
+    },
+    {
+      "id": "internal_8",
+      "title": "Analyse Concurrentielle des Fournisseurs",
+      "category": "Veille Marché",
+      "description": "Analyse comparative des fournisseurs et de leur positionnement concurrentiel.",
+      "content": "En tant qu'expert en analyse concurrentielle, effectuez une analyse comparative de notre panel fournisseurs.\n\n**Contexte marché :**\n- Entreprise : {nom_entreprise}\n- Secteur d'activité : {secteur_activite}\n- Veille marché actuelle : {veille_marche}\n- Benchmark concurrentiel : {benchmark_concurrentiel}\n\n**Périmètre d'analyse :**\n- Fournisseur principal : {fournisseur_principal}\n- Catégories étudiées : {categories_achats}\n- Tendances secteur : {tendances_secteur}\n\n**Axes d'analyse concurrentielle :**\n\n1. **Positionnement marché**\n   - Part de marché des fournisseurs\n   - Leadership technologique\n   - Positionnement prix/qualité\n   - Différenciation concurrentielle\n   - Zones géographiques couvertes\n\n2. **Capacités et ressources**\n   - Capacités de production\n   - Investissements R&D\n   - Ressources humaines et expertise\n   - Infrastructure et logistique\n   - Solidité financière\n\n3. **Offre et innovation**\n   - Largeur et profondeur de gamme\n   - Innovations récentes/à venir\n   - Services associés\n   - Customisation possible\n   - Roadmap produits\n\n4. **Performance client**\n   - Références clients\n   - Satisfaction et fidélisation\n   - Service client et support\n   - Réactivité et flexibilité\n   - Résolution de problèmes\n\n5. **Stratégie et évolution**\n   - Orientations stratégiques\n   - Acquisitions et partenariats\n   - Transformation digitale\n   - Expansion géographique\n   - Initiatives ESG\n\n**Grille comparative :**\n- Matrice de positionnement concurrentiel\n- Forces et faiblesses relatives\n- Opportunités et menaces\n- Recommandations de sourcing\n- Stratégie de panel optimale\n\n**Plan d'action :**\n- Optimisation du panel actuel\n- Identification de nouveaux fournisseurs\n- Renégociation des contrats existants\n- Veille concurrentielle continue\n- Indicateurs de suivi marché",
+      "type": "internal",
+      "variables": [
+        "nom_entreprise",
+        "secteur_activite",
+        "veille_marche",
+        "benchmark_concurrentiel",
+        "fournisseur_principal",
+        "categories_achats",
+        "tendances_secteur"
+      ],
+      "uses_cockpit_data": true,
+      "is_system": true
+    },
+    {
+      "id": "internal_9",
+      "title": "Évaluation de Conformité Réglementaire",
+      "category": "Conformité et Réglementation",
+      "description": "Audit de conformité réglementaire des fournisseurs selon les exigences sectorielles.",
+      "content": "Vous êtes un expert en conformité réglementaire. Conduisez un audit de conformité de nos fournisseurs.\n\n**Cadre réglementaire :**\n- Entreprise : {nom_entreprise}\n- Secteur : {secteur_activite}\n- Pays d'opération : {pays_siege}\n- Contraintes réglementaires : {contraintes_reglementaires}\n- Exigences conformité : {exigences_conformite}\n\n**Périmètre d'audit :**\n- Fournisseur évalué : {fournisseur_principal}\n- Certifications qualité : {certifications_qualite}\n- Évolution réglementaire : {reglementation_evolution}\n\n**Domaines de conformité :**\n\n1. **Réglementation sectorielle**\n   - Normes spécifiques au secteur\n   - Certifications obligatoires\n   - Licences et autorisations\n   - Standards techniques\n   - Réglementations douanières\n\n2. **Droit du travail et social**\n   - Respect des conventions ILO\n   - Droit du travail local\n   - Santé et sécurité au travail\n   - Non-discrimination\n   - Travail des enfants\n\n3. **Environnement et développement durable**\n   - Réglementation environnementale\n   - Gestion des déchets\n   - Émissions et pollution\n   - Économie circulaire\n   - Reporting ESG\n\n4. **Protection des données et cybersécurité**\n   - RGPD/équivalents locaux\n   - Sécurité des données\n   - Transferts internationaux\n   - Cyber-résilience\n   - Certification sécurité\n\n5. **Éthique et anti-corruption**\n   - Lois anti-corruption\n   - Code de conduite\n   - Conflits d'intérêts\n   - Transparence financière\n   - Due diligence\n\n6. **Qualité et sécurité produits**\n   - Normes de sécurité\n   - Marquage CE/équivalents\n   - Traçabilité\n   - Rappels produits\n   - Responsabilité produits\n\n**Grille d'évaluation :**\n- Statut de conformité par domaine\n- Écarts identifiés et criticité\n- Risques de non-conformité\n- Actions correctives requises\n- Délais de mise en conformité\n\n**Plan de suivi :**\n- Programme d'audits réguliers\n- Veille réglementaire\n- Formation fournisseurs\n- Clauses contractuelles\n- Indicateurs de conformité",
+      "type": "internal",
+      "variables": [
+        "nom_entreprise",
+        "secteur_activite",
+        "pays_siege",
+        "contraintes_reglementaires",
+        "exigences_conformite",
+        "fournisseur_principal",
+        "certifications_qualite",
+        "reglementation_evolution"
+      ],
+      "uses_cockpit_data": true,
+      "is_system": true
+    },
+    {
+      "id": "internal_10",
+      "title": "Innovation Collaborative Fournisseurs",
+      "category": "Innovation et Technologie",
+      "description": "Programme d'innovation collaborative avec les fournisseurs stratégiques.",
+      "content": "En tant qu'expert en innovation collaborative, développez un programme d'innovation avec nos fournisseurs.\n\n**Contexte innovation :**\n- Entreprise : {nom_entreprise}\n- Secteur : {secteur_activite}\n- Innovations recherchées : {innovations_recherchees}\n- Technologies émergentes : {technologies_emergentes}\n\n**Écosystème actuel :**\n- Fournisseur stratégique : {fournisseur_principal}\n- Partenariats stratégiques : {partenariats_strategiques}\n- Projets transformation : {projets_transformation}\n\n**Structuration du programme :**\n\n1. **Identification des opportunités**\n   - Cartographie des besoins innovation\n   - Analyse des gaps technologiques\n   - Benchmark des meilleures pratiques\n   - Veille technologique sectorielle\n   - Potentiel de différenciation\n\n2. **Sélection des partenaires**\n   - Critères de sélection fournisseurs\n   - Évaluation des capacités R&D\n   - Complémentarité technologique\n   - Appétence pour l'innovation\n   - Stabilité financière et engagement\n\n3. **Modalités de collaboration**\n   - Gouvernance des projets\n   - Répartition des investissements\n   - Propriété intellectuelle\n   - Partage des risques/bénéfices\n   - Exclusivité et non-concurrence\n\n4. **Projets d'innovation**\n   - Amélioration produits existants\n   - Développement nouvelles solutions\n   - Optimisation des processus\n   - Innovation de rupture\n   - Solutions digitales\n\n5. **Gestion du programme**\n   - Instances de pilotage\n   - Revues d'avancement\n   - Jalons et livrables\n   - Métriques de succès\n   - Communication interne/externe\n\n**Framework d'évaluation :**\n- Grille d'évaluation des projets\n- Critères de go/no-go\n- ROI et business case\n- Gestion des échecs\n- Capitalisation des apprentissages\n\n**Plan de déploiement :**\n- Phase pilote avec fournisseurs sélectionnés\n- Montée en charge progressive\n- Formation des équipes\n- Outils et processus support\n- Budget et ressources allouées\n\n**Bénéfices attendus :**\n- Innovations breakthrough\n- Amélioration de la compétitivité\n- Renforcement des partenariats\n- Accélération du time-to-market\n- Création de valeur partagée",
+      "type": "internal",
+      "variables": [
+        "nom_entreprise",
+        "secteur_activite",
+        "innovations_recherchees",
+        "technologies_emergentes",
+        "fournisseur_principal",
+        "partenariats_strategiques",
+        "projets_transformation"
+      ],
+      "uses_cockpit_data": true,
+      "is_system": true
+    },
+    {
+      "id": "external_1",
+      "title": "Benchmark Tarifaire Sectoriel",
+      "category": "Veille Marché",
+      "description": "Analyse comparative des tarifs pratiqués dans le secteur avec recommandations de négociation.",
+      "content": "<p>Vous êtes un expert en analyse de marché spécialisé dans le secteur <strong>[SECTEUR D'ACTIVITÉ]</strong>. Je souhaite réaliser un benchmark tarifaire pour optimiser mes négociations fournisseurs.</p><p><strong>Contexte :</strong></p><ul><li>Entreprise : [NOM ENTREPRISE]</li><li>Secteur d'activité : [SECTEUR]</li><li>Volume d'achats annuel : [BUDGET]</li><li>Géographie : [PAYS/RÉGION]</li></ul><p><strong>Catégories d'achats à analyser :</strong></p><ul><li>[CATÉGORIE 1] - Volume annuel : [MONTANT]</li><li>[CATÉGORIE 2] - Volume annuel : [MONTANT]</li><li>[CATÉGORIE 3] - Volume annuel : [MONTANT]</li></ul><p><strong>Analyse attendue :</strong></p><ol><li><strong>Tendances tarifaires du marché</strong><ul><li>Évolution des prix sur 12-24 mois</li><li>Facteurs d'influence (matières premières, réglementation, etc.)</li><li>Saisonnalité et cycles</li></ul></li><li><strong>Positionnement concurrentiel</strong><ul><li>Fourchettes de prix par catégorie</li><li>Positionnement de nos fournisseurs actuels</li><li>Opportunités d'économies identifiées</li></ul></li><li><strong>Stratégie de négociation</strong><ul><li>Arguments de négociation par catégorie</li><li>Timing optimal pour les renégociations</li><li>Leviers de pression disponibles</li></ul></li><li><strong>Recommandations actionables</strong><ul><li>Objectifs d'économies réalistes</li><li>Plan d'action par fournisseur</li><li>Alternatives à considérer</li></ul></li></ol>",
+      "type": "external",
+      "variables": [],
+      "uses_cockpit_data": false,
+      "is_system": true
+    },
+    {
+      "id": "external_2",
+      "title": "Cahier des Charges Appel d'Offres",
+      "category": "Stratégie Achats",
+      "description": "Rédaction complète d'un cahier des charges pour appel d'offres structuré et professionnel.",
+      "content": "<p>Vous êtes un expert en rédaction de cahiers des charges et appels d'offres. Rédigez un cahier des charges complet et structuré pour notre appel d'offres.</p><p><strong>Informations générales :</strong></p><ul><li>Entreprise : [NOM ENTREPRISE]</li><li>Secteur : [SECTEUR D'ACTIVITÉ]</li><li>Objet de l'appel d'offres : [DESCRIPTION DÉTAILLÉE]</li><li>Budget estimé : [MONTANT]</li><li>Calendrier souhaité : [PLANNING]</li></ul><p><strong>Structure du cahier des charges :</strong></p><ol><li><strong>Présentation de l'entreprise et du projet</strong><ul><li>Contexte et enjeux</li><li>Objectifs du projet</li><li>Périmètre et contraintes</li></ul></li><li><strong>Spécifications techniques détaillées</strong><ul><li>Exigences fonctionnelles</li><li>Exigences techniques</li><li>Normes et standards applicables</li><li>Contraintes d'intégration</li></ul></li><li><strong>Exigences qualité et performance</strong><ul><li>Niveaux de service attendus</li><li>Indicateurs de performance (KPI)</li><li>Processus de contrôle qualité</li><li>Pénalités en cas de non-respect</li></ul></li><li><strong>Modalités contractuelles</strong><ul><li>Type de contrat souhaité</li><li>Durée et renouvellement</li><li>Conditions de paiement</li><li>Clauses spécifiques (confidentialité, propriété intellectuelle)</li></ul></li><li><strong>Critères d'évaluation des offres</strong><ul><li>Grille de notation détaillée</li><li>Pondération des critères</li><li>Processus de sélection</li><li>Documentation à fournir</li></ul></li><li><strong>Modalités de réponse</strong><ul><li>Format et structure de la réponse</li><li>Documents à joindre</li><li>Calendrier de l'appel d'offres</li><li>Contacts et modalités de questions</li></ul></li></ol><p><strong>Annexes à prévoir :</strong></p><ul><li>Grille de réponse standardisée</li><li>Modèle de planning projet</li><li>Exemples ou références</li><li>Conditions générales d'achat</li></ul>",
+      "type": "external",
+      "variables": [],
+      "uses_cockpit_data": false,
+      "is_system": true
+    },
+    {
+      "id": "external_3",
+      "title": "Politique Achats Responsables",
+      "category": "RSE et Développement Durable",
+      "description": "Élaboration d'une politique d'achats responsables intégrant les enjeux ESG.",
+      "content": "<p>En tant qu'expert en achats responsables et développement durable, rédigez une politique d'achats responsables complète pour notre organisation.</p><p><strong>Contexte organisation :</strong></p><ul><li>Entreprise : [NOM ENTREPRISE]</li><li>Secteur : [SECTEUR D'ACTIVITÉ]</li><li>Taille : [NOMBRE D'EMPLOYÉS] employés</li><li>Implantations : [GÉOGRAPHIE]</li><li>Budget achats annuel : [MONTANT]</li></ul><p><strong>Enjeux RSE prioritaires :</strong></p><ul><li>Environnement : [OBJECTIFS ENVIRONNEMENTAUX]</li><li>Social : [OBJECTIFS SOCIAUX]</li><li>Gouvernance : [OBJECTIFS GOUVERNANCE]</li><li>Certifications visées : [CERTIFICATIONS]</li></ul><p><strong>Structure de la politique :</strong></p><ol><li><strong>Vision et engagements</strong><ul><li>Déclaration d'intention du dirigeant</li><li>Valeurs et principes fondamentaux</li><li>Objectifs stratégiques RSE</li><li>Alignement avec les ODD</li></ul></li><li><strong>Périmètre et gouvernance</strong><ul><li>Scope d'application</li><li>Rôles et responsabilités</li><li>Instances de pilotage</li><li>Processus de décision</li></ul></li><li><strong>Critères et exigences fournisseurs</strong><ul><li>Critères environnementaux obligatoires</li><li>Exigences sociales et éthiques</li><li>Standards de gouvernance</li><li>Certifications requises</li></ul></li><li><strong>Processus d'évaluation et sélection</strong><ul><li>Grille d'évaluation ESG</li><li>Processus de due diligence</li><li>Critères d'exclusion</li><li>Pondération RSE dans les appels d'offres</li></ul></li><li><strong>Accompagnement et développement</strong><ul><li>Programme de développement fournisseurs</li><li>Formations et sensibilisation</li><li>Partage de bonnes pratiques</li><li>Innovation collaborative durable</li></ul></li><li><strong>Suivi et reporting</strong><ul><li>Indicateurs de performance RSE</li><li>Audits et contrôles</li><li>Reporting externe</li><li>Communication et transparence</li></ul></li></ol><p><strong>Plan de déploiement :</strong></p><ul><li>Phase pilote et généralisation</li><li>Formation des équipes</li><li>Communication interne et externe</li><li>Budget et ressources</li><li>Planning de mise en œuvre</li></ul>",
+      "type": "external",
+      "variables": [],
+      "uses_cockpit_data": false,
+      "is_system": true
+    },
+    {
+      "id": "external_4",
+      "title": "Matrice d'Évaluation Fournisseurs",
+      "category": "Évaluation Fournisseur",
+      "description": "Création d'une matrice d'évaluation fournisseurs multi-critères avec système de notation.",
+      "content": "<p>Vous êtes un expert en évaluation et gestion de la performance fournisseurs. Concevez une matrice d'évaluation complète et opérationnelle.</p><p><strong>Contexte évaluation :</strong></p><ul><li>Entreprise : [NOM ENTREPRISE]</li><li>Secteur : [SECTEUR D'ACTIVITÉ]</li><li>Types de fournisseurs : [CATÉGORIES]</li><li>Fréquence d'évaluation : [ANNUELLE/SEMESTRIELLE]</li><li>Nombre de fournisseurs à évaluer : [NOMBRE]</li></ul><p><strong>Objectifs de l'évaluation :</strong></p><ul><li>Mesurer la performance globale</li><li>Identifier les axes d'amélioration</li><li>Segmenter le panel fournisseurs</li><li>Orienter les décisions de renouvellement</li><li>Développer les partenariats stratégiques</li></ul><p><strong>Critères d'évaluation :</strong></p><ol><li><strong>Qualité (pondération : 30%)</strong><ul><li>Conformité des produits/services</li><li>Taux de défauts et réclamations</li><li>Certifications qualité</li><li>Amélioration continue</li></ul></li><li><strong>Livraison (pondération : 25%)</strong><ul><li>Respect des délais</li><li>Fiabilité des livraisons</li><li>Flexibilité et réactivité</li><li>Gestion des urgences</li></ul></li><li><strong>Prix et conditions (pondération : 20%)</strong><ul><li>Compétitivité tarifaire</li><li>Évolution des prix</li><li>Conditions de paiement</li><li>Transparence tarifaire</li></ul></li><li><strong>Service et relation (pondération : 15%)</strong><ul><li>Qualité du service client</li><li>Réactivité aux demandes</li><li>Communication proactive</li><li>Résolution de problèmes</li></ul></li><li><strong>Innovation et développement (pondération : 10%)</strong><ul><li>Capacité d'innovation</li><li>Propositions d'amélioration</li><li>Veille technologique</li><li>Partenariat R&D</li></ul></li></ol><p><strong>Système de notation :</strong></p><ul><li>Échelle de notation (1 à 5 ou 1 à 10)</li><li>Définition de chaque niveau</li><li>Calcul du score global pondéré</li><li>Seuils de performance (excellent/bon/acceptable/insuffisant)</li></ul><p><strong>Processus d'évaluation :</strong></p><ul><li>Collecte des données (KPI, enquêtes, audits)</li><li>Grille de saisie standardisée</li><li>Validation et consolidation</li><li>Restitution aux fournisseurs</li><li>Plans d'action et suivi</li></ul><p><strong>Actions par niveau de performance :</strong></p><ul><li>Fournisseurs stratégiques (score >8/10)</li><li>Fournisseurs performants (score 6-8/10)</li><li>Fournisseurs à développer (score 4-6/10)</li><li>Fournisseurs à risque (score <4/10)</li></ul>",
+      "type": "external",
+      "variables": [],
+      "uses_cockpit_data": false,
+      "is_system": true
+    },
+    {
+      "id": "external_5",
+      "title": "Contrat de Partenariat Stratégique",
+      "category": "Analyse Contractuelle",
+      "description": "Modèle de contrat de partenariat stratégique avec clauses spécifiques à la relation privilégiée.",
+      "content": "<p>Vous êtes un expert juridique spécialisé en droit des contrats commerciaux. Rédigez un modèle de contrat de partenariat stratégique complet.</p><p><strong>Contexte du partenariat :</strong></p><ul><li>Entreprise cliente : [NOM ENTREPRISE]</li><li>Partenaire fournisseur : [NOM FOURNISSEUR]</li><li>Objet du partenariat : [DESCRIPTION]</li><li>Durée envisagée : [DURÉE]</li><li>Montant annuel estimé : [MONTANT]</li></ul><p><strong>Spécificités du partenariat :</strong></p><ul><li>Innovation collaborative</li><li>Exclusivité partielle ou totale</li><li>Investissements mutuels</li><li>Partage de données</li><li>Objectifs de performance communs</li></ul><p><strong>Structure contractuelle :</strong></p><ol><li><strong>Préambule et définitions</strong><ul><li>Contexte et enjeux du partenariat</li><li>Définitions des termes techniques</li><li>Références aux documents annexes</li></ul></li><li><strong>Objet et périmètre</strong><ul><li>Description détaillée des prestations</li><li>Exclusivité et territorialité</li><li>Évolutions et extensions possibles</li></ul></li><li><strong>Conditions financières</strong><ul><li>Pricing et mécanismes tarifaires</li><li>Modalités de facturation</li><li>Conditions de paiement</li><li>Mécanismes d'intéressement</li></ul></li><li><strong>Gouvernance du partenariat</strong><ul><li>Instances de pilotage</li><li>Comités techniques et stratégiques</li><li>Processus de décision</li><li>Reporting et communication</li></ul></li><li><strong>Innovation et propriété intellectuelle</strong><ul><li>Projets d'innovation communs</li><li>Répartition des investissements R&D</li><li>Propriété des développements</li><li>Licences et exploitation</li></ul></li><li><strong>Niveau de service et performance</strong><ul><li>SLA (Service Level Agreements)</li><li>KPI et tableaux de bord</li><li>Processus d'amélioration continue</li><li>Pénalités et bonus</li></ul></li><li><strong>Gestion des risques</strong><ul><li>Identification et partage des risques</li><li>Assurances et garanties</li><li>Plan de continuité d'activité</li><li>Force majeure</li></ul></li><li><strong>Confidentialité et données</strong><ul><li>Engagements de confidentialité</li><li>Protection des données</li><li>Sécurité informatique</li><li>Transferts internationaux</li></ul></li><li><strong>Résiliation et fin de contrat</strong><ul><li>Conditions de résiliation</li><li>Préavis et procédures</li><li>Transfert d'activités</li><li>Obligations post-contractuelles</li></ul></li></ol><p><strong>Annexes spécialisées :</strong></p><ul><li>Spécifications techniques détaillées</li><li>Conditions générales d'achat adaptées</li><li>Grilles tarifaires et indexation</li><li>Processus de gouvernance</li><li>Plans de développement communs</li></ul>",
+      "type": "external",
+      "variables": [],
+      "uses_cockpit_data": false,
+      "is_system": true
+    },
+    {
+      "id": "external_6",
+      "title": "Plan de Transformation Digitale Achats",
+      "category": "Innovation et Technologie",
+      "description": "Stratégie complète de transformation digitale de la fonction achats avec roadmap technologique.",
+      "content": "<p>Vous êtes un expert en transformation digitale spécialisé dans la fonction achats. Élaborez un plan de transformation digitale complet pour moderniser nos processus achats.</p><p><strong>État des lieux actuel :</strong></p><ul><li>Entreprise : [NOM ENTREPRISE]</li><li>Secteur : [SECTEUR D'ACTIVITÉ]</li><li>Budget achats annuel : [MONTANT]</li><li>Équipes achats : [NOMBRE] personnes</li><li>Systèmes actuels : [ERP/OUTILS EXISTANTS]</li><li>Niveau de maturité digitale : [DÉBUTANT/INTERMÉDIAIRE/AVANCÉ]</li></ul><p><strong>Objectifs de transformation :</strong></p><ul><li>Automatisation des processus répétitifs</li><li>Amélioration de l'expérience utilisateur</li><li>Renforcement de l'analytics et du pilotage</li><li>Optimisation de la gestion fournisseurs</li><li>Réduction des coûts opérationnels</li></ul><p><strong>Axes de transformation :</strong></p><ol><li><strong>Digitalisation des processus core</strong><ul><li>e-Procurement et catalogues électroniques</li><li>Workflows d'approbation digitaux</li><li>Signature électronique</li><li>Dématérialisation des factures</li></ul></li><li><strong>Intelligence artificielle et automatisation</strong><ul><li>Analyse prédictive des besoins</li><li>Classification automatique des dépenses</li><li>Détection d'anomalies</li><li>Chatbots pour support utilisateurs</li></ul></li><li><strong>Analytics et Business Intelligence</strong><ul><li>Tableaux de bord temps réel</li><li>Analyse des performances fournisseurs</li><li>Optimisation du sourcing</li><li>Predictive analytics</li></ul></li><li><strong>Collaboration et écosystème</strong><ul><li>Portail fournisseurs intégré</li><li>Marketplaces et plateformes</li><li>Collaboration en temps réel</li><li>APIs et intégrations</li></ul></li><li><strong>Mobilité et expérience utilisateur</strong><ul><li>Applications mobiles</li><li>Interface utilisateur moderne</li><li>Self-service étendu</li><li>Personnalisation des interfaces</li></ul></li></ol><p><strong>Roadmap de déploiement :</strong></p><ul><li><strong>Phase 1 (0-6 mois) :</strong> Fondations<ul><li>Audit et cartographie existant</li><li>Sélection des solutions</li><li>Mise en place des bases</li></ul></li><li><strong>Phase 2 (6-12 mois) :</strong> Processus core<ul><li>Déploiement e-procurement</li><li>Automatisation workflows</li><li>Formation utilisateurs</li></ul></li><li><strong>Phase 3 (12-18 mois) :</strong> Intelligence et analytics<ul><li>Mise en place BI</li><li>Déploiement IA</li><li>Optimisation processus</li></ul></li><li><strong>Phase 4 (18-24 mois) :</strong> Écosystème étendu<ul><li>Intégration fournisseurs</li><li>APIs et connecteurs</li><li>Innovation continue</li></ul></li></ul><p><strong>Facteurs clés de succès :</strong></p><ul><li>Sponsor exécutif fort</li><li>Conduite du changement structurée</li><li>Formation et accompagnement</li><li>Communication continue</li><li>Mesure ROI et bénéfices</li></ul><p><strong>Budget et ressources :</strong></p><ul><li>Estimation investissements par phase</li><li>Ressources humaines nécessaires</li><li>Coûts de formation</li><li>ROI attendu et délais</li></ul>",
+      "type": "external",
+      "variables": [],
+      "uses_cockpit_data": false,
+      "is_system": true
+    },
+    {
+      "id": "external_7",
+      "title": "Audit de Sécurité Fournisseurs",
+      "category": "Gestion des Risques",
+      "description": "Méthodologie d'audit de sécurité informatique et physique des fournisseurs critiques.",
+      "content": "<p>Vous êtes un expert en sécurité et gestion des risques. Élaborez une méthodologie d'audit de sécurité complète pour nos fournisseurs critiques.</p><p><strong>Contexte sécuritaire :</strong></p><ul><li>Entreprise : [NOM ENTREPRISE]</li><li>Secteur : [SECTEUR D'ACTIVITÉ]</li><li>Criticité des données : [NIVEAU]</li><li>Réglementations applicables : [RGPD, ISO27001, etc.]</li><li>Incidents passés : [HISTORIQUE]</li></ul><p><strong>Périmètre de l'audit :</strong></p><ul><li>Fournisseurs critiques IT</li><li>Sous-traitants avec accès aux données</li><li>Partenaires avec connexions systèmes</li><li>Prestataires sur site</li></ul><p><strong>Domaines d'audit sécurité :</strong></p><ol><li><strong>Gouvernance et organisation sécurité</strong><ul><li>Politique de sécurité</li><li>Organisation de la sécurité</li><li>Gestion des risques</li><li>Conformité réglementaire</li><li>Sensibilisation et formation</li></ul></li><li><strong>Sécurité physique et environnementale</strong><ul><li>Contrôle d'accès physique</li><li>Protection des équipements</li><li>Sécurité des datacenters</li><li>Gestion des supports</li><li>Plan de continuité</li></ul></li><li><strong>Sécurité des systèmes d'information</strong><ul><li>Architecture de sécurité</li><li>Gestion des accès et identités</li><li>Chiffrement et cryptographie</li><li>Surveillance et détection</li><li>Gestion des vulnérabilités</li></ul></li><li><strong>Sécurité réseau et communications</strong><ul><li>Segmentation réseau</li><li>Firewall et filtrage</li><li>Sécurité des communications</li><li>VPN et accès distants</li><li>Surveillance du trafic</li></ul></li><li><strong>Développement et maintenance sécurisés</strong><ul><li>Cycle de développement sécurisé</li><li>Tests de sécurité</li><li>Gestion des changements</li><li>Maintenance préventive</li><li>Sauvegarde et restauration</li></ul></li><li><strong>Gestion des incidents de sécurité</strong><ul><li>Processus de gestion des incidents</li><li>Détection et signalement</li><li>Réponse et investigation</li><li>Communication de crise</li><li>Retour d'expérience</li></ul></li><li><strong>Protection des données personnelles</strong><ul><li>Conformité RGPD</li><li>Collecte et traitement</li><li>Droits des personnes</li><li>Transferts internationaux</li><li>DPO et gouvernance</li></ul></li></ol><p><strong>Méthodologie d'audit :</strong></p><ul><li><strong>Préparation :</strong> Questionnaire préalable, planification</li><li><strong>Audit documentaire :</strong> Revue des politiques et procédures</li><li><strong>Audit technique :</strong> Tests d'intrusion, scan de vulnérabilités</li><li><strong>Audit organisationnel :</strong> Entretiens, observation</li><li><strong>Synthèse :</strong> Rapport d'audit et plan d'action</li></ul><p><strong>Grille d'évaluation :</strong></p><ul><li>Échelle de notation par domaine</li><li>Criticité des non-conformités</li><li>Score global de sécurité</li><li>Seuils d'acceptabilité</li><li>Actions correctives obligatoires</li></ul><p><strong>Suivi et contrôle :</strong></p><ul><li>Plan d'action correctif</li><li>Échéances de mise en conformité</li><li>Audits de suivi</li><li>Pénalités contractuelles</li><li>Résiliation en cas de manquements graves</li></ul>",
+      "type": "external",
+      "variables": [],
+      "uses_cockpit_data": false,
+      "is_system": true
+    },
+    {
+      "id": "external_8",
+      "title": "Optimisation Coûts et Total Cost of Ownership",
+      "category": "Stratégie Achats",
+      "description": "Analyse TCO complète avec identification des leviers d'optimisation des coûts.",
+      "content": "<p>Vous êtes un expert en optimisation des coûts et analyse TCO (Total Cost of Ownership). Réalisez une analyse complète pour optimiser nos coûts d'achat.</p><p><strong>Contexte économique :</strong></p><ul><li>Entreprise : [NOM ENTREPRISE]</li><li>Secteur : [SECTEUR D'ACTIVITÉ]</li><li>Budget achats total : [MONTANT ANNUEL]</li><li>Objectif d'économies : [POURCENTAGE/MONTANT]</li><li>Horizon temporel : [DURÉE]</li></ul><p><strong>Périmètre d'analyse :</strong></p><ul><li>Catégorie d'achats : [CATÉGORIE PRINCIPALE]</li><li>Fournisseurs principaux : [NOMS]</li><li>Volume annuel : [QUANTITÉS/MONTANTS]</li><li>Contrats actuels : [DURÉES ET CONDITIONS]</li></ul><p><strong>Analyse du Total Cost of Ownership :</strong></p><ol><li><strong>Coûts d'acquisition directs</strong><ul><li>Prix d'achat unitaire</li><li>Frais de transport et logistique</li><li>Assurances et douanes</li><li>Frais de mise en service</li></ul></li><li><strong>Coûts d'exploitation</strong><ul><li>Consommations (énergie, consommables)</li><li>Maintenance préventive et curative</li><li>Formation et accompagnement</li><li>Coûts de non-qualité</li></ul></li><li><strong>Coûts de fin de vie</strong><ul><li>Démantèlement et désinscription</li><li>Recyclage et traitement</li><li>Remise en état</li><li>Obsolescence</li></ul></li><li><strong>Coûts cachés et indirects</strong><ul><li>Temps de gestion interne</li><li>Coûts de stockage</li><li>Risques et assurances</li><li>Coût du capital immobilisé</li></ul></li></ol><p><strong>Leviers d'optimisation identifiés :</strong></p><ol><li><strong>Optimisation du sourcing</strong><ul><li>Élargissement du panel fournisseurs</li><li>Négociation groupée/consortiums</li><li>Optimisation géographique</li><li>Contrats long terme vs spot</li></ul></li><li><strong>Rationalisation des besoins</strong><ul><li>Standardisation des spécifications</li><li>Mutualisation des achats</li><li>Optimisation des volumes</li><li>Révision des cahiers des charges</li></ul></li><li><strong>Innovation dans l'approche</strong><ul><li>Nouvelles technologies alternatives</li><li>Économie de fonctionnalité</li><li>Partenariats innovants</li><li>Solutions de substitution</li></ul></li><li><strong>Amélioration des processus</strong><ul><li>Automatisation des tâches</li><li>Réduction des délais</li><li>Diminution des rebuts</li><li>Optimisation logistique</li></ul></li></ol><p><strong>Plan d'action chiffré :</strong></p><ul><li><strong>Actions court terme (0-6 mois) :</strong><ul><li>Renégociations prioritaires</li><li>Quick wins identifiés</li><li>Économies attendues : [MONTANT]</li></ul></li><li><strong>Actions moyen terme (6-18 mois) :</strong><ul><li>Projets de rationalisation</li><li>Nouveaux sourcing</li><li>Économies attendues : [MONTANT]</li></ul></li><li><strong>Actions long terme (18+ mois) :</strong><ul><li>Transformation structurelle</li><li>Innovation et partenariats</li><li>Économies attendues : [MONTANT]</li></ul></li></ul><p><strong>Suivi et mesure :</strong></p><ul><li>KPI de suivi des économies</li><li>Tableau de bord TCO</li><li>Reporting mensuel/trimestriel</li><li>Révision annuelle de la stratégie</li></ul>",
+      "type": "external",
+      "variables": [],
+      "uses_cockpit_data": false,
+      "is_system": true
+    },
+    {
+      "id": "external_9",
+      "title": "Stratégie de Diversification Fournisseurs",
+      "category": "Gestion des Risques",
+      "description": "Plan de diversification du panel fournisseurs pour réduire les risques de dépendance.",
+      "content": "<p>Vous êtes un expert en gestion des risques fournisseurs et diversification du sourcing. Élaborez une stratégie de diversification pour sécuriser notre chaîne d'approvisionnement.</p><p><strong>Situation actuelle :</strong></p><ul><li>Entreprise : [NOM ENTREPRISE]</li><li>Secteur : [SECTEUR D'ACTIVITÉ]</li><li>Nombre de fournisseurs actifs : [NOMBRE]</li><li>Fournisseurs représentant 80% des achats : [NOMBRE]</li><li>Concentration géographique : [PAYS/RÉGIONS]</li></ul><p><strong>Risques identifiés :</strong></p><ul><li>Sur-dépendance à certains fournisseurs critiques</li><li>Concentration géographique excessive</li><li>Vulnérabilité aux crises sectorielles</li><li>Manque d'alternatives crédibles</li><li>Pouvoir de négociation déséquilibré</li></ul><p><strong>Analyse de la concentration actuelle :</strong></p><ol><li><strong>Analyse par fournisseur</strong><ul><li>Top 10 des fournisseurs (% CA)</li><li>Dépendance mutuelle</li><li>Criticité pour l'activité</li><li>Facilité de substitution</li></ul></li><li><strong>Analyse par catégorie</strong><ul><li>Répartition par famille d'achats</li><li>Nombre de fournisseurs par catégorie</li><li>Indices de concentration</li><li>Barrières à l'entrée</li></ul></li><li><strong>Analyse géographique</strong><ul><li>Répartition par pays/régions</li><li>Risques géopolitiques</li><li>Risques logistiques</li><li>Diversité des écosystèmes</li></ul></li></ol><p><strong>Stratégie de diversification :</strong></p><ol><li><strong>Identification de nouveaux fournisseurs</strong><ul><li>Cartographie mondiale des capacités</li><li>Sourcing dans de nouveaux pays/régions</li><li>Qualification de fournisseurs alternatifs</li><li>Développement de fournisseurs émergents</li></ul></li><li><strong>Segmentation et priorisation</strong><ul><li>Matrice criticité/substitution</li><li>Priorisation des actions par risque</li><li>Approche différenciée par catégorie</li><li>Planning de déploiement</li></ul></li><li><strong>Modèles de sourcing adaptés</strong><ul><li>Multi-sourcing vs single sourcing</li><li>Fournisseurs principaux/secondaires</li><li>Contrats contingents</li><li>Accords de backup</li></ul></li><li><strong>Développement d'écosystèmes</strong><ul><li>Partenariats régionaux</li><li>Soutien aux PME locales</li><li>Investissements dans les capacités</li><li>Innovation collaborative</li></ul></li></ol><p><strong>Plan d'action opérationnel :</strong></p><ul><li><strong>Phase 1 - Diagnostic et priorisation</strong><ul><li>Audit du panel actuel</li><li>Cartographie des risques</li><li>Définition des objectifs</li></ul></li><li><strong>Phase 2 - Sourcing et qualification</strong><ul><li>Recherche de nouveaux fournisseurs</li><li>Processus de qualification</li><li>Tests et validation</li></ul></li><li><strong>Phase 3 - Intégration progressive</strong><ul><li>Attribution de volumes tests</li><li>Montée en charge contrôlée</li><li>Développement des capacités</li></ul></li><li><strong>Phase 4 - Optimisation continue</strong><ul><li>Révision régulière du panel</li><li>Ajustement des volumes</li><li>Performance monitoring</li></ul></li></ul><p><strong>Critères de réussite :</strong></p><ul><li>Réduction de la concentration (indice HHI)</li><li>Amélioration de la résilience</li><li>Maintien de la qualité</li><li>Maîtrise des coûts</li><li>Délais de substitution raccourcis</li></ul><p><strong>Gouvernance et suivi :</strong></p><ul><li>Comité de pilotage diversification</li><li>Indicateurs de suivi mensuel</li><li>Revue trimestrielle des risques</li><li>Tests de continuité réguliers</li></ul>",
+      "type": "external",
+      "variables": [],
+      "uses_cockpit_data": false,
+      "is_system": true
+    },
+    {
+      "id": "external_10",
+      "title": "Programme de Développement Durable",
+      "category": "RSE et Développement Durable",
+      "description": "Conception d'un programme complet d'achats durables avec objectifs ESG mesurables.",
+      "content": "<p>Vous êtes un expert en développement durable et achats responsables. Concevez un programme complet d'achats durables aligné sur les objectifs ESG de notre organisation.</p><p><strong>Contexte ESG :</strong></p><ul><li>Entreprise : [NOM ENTREPRISE]</li><li>Secteur : [SECTEUR D'ACTIVITÉ]</li><li>Engagement climatique : [OBJECTIFS CARBONE]</li><li>Certifications visées : [B-CORP, ISO14001, etc.]</li><li>Reporting ESG : [STANDARDS SUIVIS]</li></ul><p><strong>Enjeux prioritaires :</strong></p><ul><li>Réduction empreinte carbone</li><li>Économie circulaire</li><li>Éthique et droits humains</li><li>Innovation durable</li><li>Impact local et social</li></ul><p><strong>Programme d'achats durables :</strong></p><ol><li><strong>Gouvernance et pilotage ESG</strong><ul><li>Comité de pilotage ESG achats</li><li>Référent développement durable</li><li>Formation équipes achats</li><li>Intégration dans les processus</li></ul></li><li><strong>Évaluation et sélection durable</strong><ul><li>Critères ESG dans les appels d'offres</li><li>Questionnaires de qualification ESG</li><li>Audit et certification fournisseurs</li><li>Score de durabilité global</li></ul></li><li><strong>Objectifs environnementaux</strong><ul><li>Réduction émissions scope 3</li><li>Approvisionnement énergies renouvelables</li><li>Économie circulaire et recyclage</li><li>Réduction déchets et emballages</li><li>Préservation biodiversité</li></ul></li><li><strong>Dimension sociale et éthique</strong><ul><li>Respect droits humains fondamentaux</li><li>Conditions de travail décentes</li><li>Égalité et non-discrimination</li><li>Développement communautés locales</li><li>Chaîne d'approvisionnement éthique</li></ul></li><li><strong>Innovation et économie circulaire</strong><ul><li>Éco-conception des produits</li><li>Solutions de réemploi/réparation</li><li>Partenariats innovation durable</li><li>Technologies vertes</li><li>Modèles économiques circulaires</li></ul></li><li><strong>Sourcing local et responsable</strong><ul><li>Privilégier les circuits courts</li><li>Soutien aux PME locales</li><li>Commerce équitable</li><li>Agriculture raisonnée/bio</li><li>Secteur adapté et inclusif</li></ul></li></ol><p><strong>Plan d'action par phase :</strong></p><ul><li><strong>Phase 1 (0-12 mois) - Fondations</strong><ul><li>Diagnostic ESG du panel actuel</li><li>Formation équipes et sensibilisation</li><li>Intégration critères ESG dans processus</li><li>Premiers contrats pilotes</li></ul></li><li><strong>Phase 2 (12-24 mois) - Déploiement</strong><ul><li>Généralisation critères ESG</li><li>Programme développement fournisseurs</li><li>Partenariats innovation durable</li><li>Mesure et reporting impacts</li></ul></li><li><strong>Phase 3 (24+ mois) - Excellence</strong><ul><li>Leadership sectoriel</li><li>Écosystème durable mature</li><li>Innovation collaborative</li><li>Certification et reconnaissance</li></ul></li></ul><p><strong>Indicateurs de performance :</strong></p><ul><li><strong>Environnement :</strong><ul><li>% réduction émissions CO2 scope 3</li><li>% achats éco-labellisés</li><li>Taux recyclage/réemploi</li><li>% énergies renouvelables</li></ul></li><li><strong>Social :</strong><ul><li>% fournisseurs audités droits humains</li><li>Score diversité du panel</li><li>% achats solidaires/locaux</li><li>Emplois créés/maintenus</li></ul></li><li><strong>Gouvernance :</strong><ul><li>% fournisseurs certifiés ESG</li><li>Score transparence chaîne</li><li>Taux conformité code conduite</li><li>% objectifs ESG atteints</li></ul></li></ul><p><strong>Communication et reporting :</strong></p><ul><li>Rapport annuel développement durable</li><li>Communication interne/externe</li><li>Participation initiatives sectorielles</li><li>Benchmarking et bonnes pratiques</li></ul>",
+      "type": "external",
+      "variables": [],
+      "uses_cockpit_data": false,
+      "is_system": true
     }
   ]
 }
