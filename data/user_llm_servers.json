@@ -50,5 +50,18 @@
     "created_at": "2025-06-02T15:17:10.940805",
     "updated_at": "2025-06-02T15:17:11.286949",
     "is_active": false
+  },
+  "594e1c2d-ad1b-42ac-b5d6-b0c0ab1ffbfe": {
+    "id": "594e1c2d-ad1b-42ac-b5d6-b0c0ab1ffbfe",
+    "user_id": "_HkHVhXpcT80xLkhdhuHlQ",
+    "name": "Updated Test Server",
+    "type": "openai",
+    "url": "https://api.openai.com",
+    "api_key": "test_key_123",
+    "default_model": "gpt-4",
+    "port": null,
+    "created_at": "2025-06-02T15:50:16.154536",
+    "updated_at": "2025-06-02T15:50:16.369789",
+    "is_active": false
   }
 }
