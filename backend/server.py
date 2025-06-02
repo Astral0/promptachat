@@ -1059,7 +1059,7 @@ async def execute_prompt(
     # Execute prompt
     result = await prompt_execution_service.execute_prompt(
         request,
-        prompt.content,
+        prompt['content'],
         server_config
     )
     
