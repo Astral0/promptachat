@@ -632,6 +632,191 @@ async def delete_user(
     return {"message": "Utilisateur supprimé avec succès"}
 
 # ===============================
+# Cockpit Variables Routes
+# ===============================
+
+@api_router.get("/cockpit/variables", response_model=List[CockpitVariable])
+async def get_cockpit_variables():
+    """Get all available Cockpit variables."""
+    return cockpit_service.get_all_variables()
+
+@api_router.get("/cockpit/variables/dict")
+async def get_cockpit_variables_dict():
+    """Get Cockpit variables as a dictionary."""
+    return cockpit_service.get_variables_dict()
+
+@api_router.post("/cockpit/extract-variables")
+async def extract_cockpit_variables(content: Dict[str, str]):
+    """Extract Cockpit variables from prompt content."""
+    prompt_content = content.get("content", "")
+    variables = cockpit_service.extract_cockpit_variables_from_content(prompt_content)
+    uses_cockpit = cockpit_service.check_uses_cockpit_data(variables)
+    
+    return {
+        "cockpit_variables": variables,
+        "uses_cockpit_data": uses_cockpit,
+        "formatted_variables": cockpit_service.format_variables_for_prompt(variables)
+    }
+
+# ===============================  
+# User LLM Server Routes
+# ===============================
+
+@api_router.get("/user/llm-servers", response_model=List[UserLLMServer])
+async def get_user_llm_servers(current_user: User = Depends(get_current_user)):
+    """Get all LLM servers for the current user."""
+    return user_llm_server_service.get_user_servers(current_user.id)
+
+@api_router.get("/user/llm-servers/all")
+async def get_all_available_servers(current_user: User = Depends(get_current_user)):
+    """Get all available servers (system + user) for the current user."""
+    return user_llm_server_service.get_all_available_servers(current_user.id)
+
+@api_router.post("/user/llm-servers", response_model=UserLLMServer)
+async def create_user_llm_server(
+    server_data: UserLLMServerCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new LLM server for the user."""
+    return user_llm_server_service.create_server(current_user.id, server_data)
+
+@api_router.get("/user/llm-servers/{server_id}", response_model=UserLLMServer)
+async def get_user_llm_server(
+    server_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get a specific user LLM server."""
+    server = user_llm_server_service.get_server(server_id, current_user.id)
+    if not server:
+        raise HTTPException(status_code=404, detail="Serveur LLM non trouvé")
+    return server
+
+@api_router.put("/user/llm-servers/{server_id}", response_model=UserLLMServer)
+async def update_user_llm_server(
+    server_id: str,
+    updates: UserLLMServerUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    """Update a user LLM server."""
+    server = user_llm_server_service.update_server(server_id, current_user.id, updates)
+    if not server:
+        raise HTTPException(status_code=404, detail="Serveur LLM non trouvé")
+    return server
+
+@api_router.delete("/user/llm-servers/{server_id}")
+async def delete_user_llm_server(
+    server_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Delete a user LLM server."""
+    success = user_llm_server_service.delete_server(server_id, current_user.id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Serveur LLM non trouvé")
+    return {"message": "Serveur LLM supprimé avec succès"}
+
+@api_router.post("/user/llm-servers/{server_id}/test")
+async def test_user_llm_server(
+    server_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Test connection to a user LLM server."""
+    server = user_llm_server_service.get_server(server_id, current_user.id)
+    if not server:
+        raise HTTPException(status_code=404, detail="Serveur LLM non trouvé")
+    
+    result = user_llm_server_service.test_server_connection(server)
+    return result
+
+# ===============================
+# Category Routes  
+# ===============================
+
+@api_router.get("/categories", response_model=List[Category])
+async def get_categories(current_user: Optional[User] = Depends(get_current_user_optional)):
+    """Get all categories available to the user."""
+    user_id = current_user.id if current_user else None
+    return category_service.get_categories_by_user(user_id)
+
+@api_router.get("/categories/dict")
+async def get_categories_dict(current_user: Optional[User] = Depends(get_current_user_optional)):
+    """Get categories as a dictionary."""
+    return category_service.get_categories_dict()
+
+@api_router.post("/categories", response_model=Category)
+async def create_category(
+    category_data: CategoryCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new user category."""
+    return category_service.create_category(category_data, current_user.id)
+
+@api_router.put("/categories/{category_id}", response_model=Category)
+async def update_category(
+    category_id: str,
+    updates: CategoryUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    """Update a user category."""
+    category = category_service.update_category(category_id, updates, current_user.id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Catégorie non trouvée ou non autorisée")
+    return category
+
+@api_router.delete("/categories/{category_id}")
+async def delete_category(
+    category_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Delete a user category."""
+    success = category_service.delete_category(category_id, current_user.id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Catégorie non trouvée ou non autorisée")
+    return {"message": "Catégorie supprimée avec succès"}
+
+@api_router.post("/categories/suggest")
+async def suggest_category(data: Dict[str, str]):
+    """Suggest a category for a prompt based on its content."""
+    title = data.get("title", "")
+    content = data.get("content", "")
+    
+    suggested_category_id = category_service.suggest_category_for_prompt(title, content)
+    
+    if suggested_category_id:
+        category = category_service.get_category(suggested_category_id)
+        return {
+            "suggested_category_id": suggested_category_id,
+            "suggested_category_name": category.name if category else None
+        }
+    
+    return {"suggested_category_id": None, "suggested_category_name": None}
+
+# ===============================
+# Enhanced Prompt Routes
+# ===============================
+
+@api_router.post("/prompts/import-new")
+async def import_new_prompts(admin_user: User = Depends(get_admin_user)):
+    """Import new prompts from the predefined collection (admin only)."""
+    try:
+        # Import the new prompts
+        import sys
+        sys.path.append(str(ROOT_DIR))
+        from import_prompts import import_new_prompts
+        
+        result = import_new_prompts()
+        
+        # Reload prompt service to pick up new prompts
+        prompt_service._load_system_prompts()
+        
+        return {
+            "message": "Nouveaux prompts importés avec succès",
+            "total_prompts": len(result.get("system_prompts", []))
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur lors de l'import: {str(e)}")
+
+# ===============================
 # Health Check Routes
 # ===============================
 

@@ -1,0 +1,82 @@
+{
+  "59051350-86cf-4aa9-aaad-df22c518f29d": {
+    "id": "59051350-86cf-4aa9-aaad-df22c518f29d",
+    "name": "Analyse Contractuelle",
+    "description": "Prompts pour l'analyse et l'évaluation de contrats fournisseurs",
+    "created_by": null,
+    "created_at": "2025-06-02T14:41:04.208827",
+    "is_system": true
+  },
+  "07657936-7534-4778-a7b0-b32ecd3bfd39": {
+    "id": "07657936-7534-4778-a7b0-b32ecd3bfd39",
+    "name": "Évaluation Fournisseur",
+    "description": "Prompts pour évaluer les performances et la qualité des fournisseurs",
+    "created_by": null,
+    "created_at": "2025-06-02T14:41:04.208847",
+    "is_system": true
+  },
+  "519cb2e4-b241-459f-9d7e-cecb635b50d7": {
+    "id": "519cb2e4-b241-459f-9d7e-cecb635b50d7",
+    "name": "Négociation",
+    "description": "Prompts d'aide à la négociation et aux stratégies d'achat",
+    "created_by": null,
+    "created_at": "2025-06-02T14:41:04.208856",
+    "is_system": true
+  },
+  "079453c7-375d-45e0-9815-c54636c940d6": {
+    "id": "079453c7-375d-45e0-9815-c54636c940d6",
+    "name": "Veille Marché",
+    "description": "Prompts pour la surveillance et l'analyse des marchés",
+    "created_by": null,
+    "created_at": "2025-06-02T14:41:04.208868",
+    "is_system": true
+  },
+  "43019863-2ea4-4406-877d-5f6fa0706ba7": {
+    "id": "43019863-2ea4-4406-877d-5f6fa0706ba7",
+    "name": "RSE et Développement Durable",
+    "description": "Prompts liés à la responsabilité sociale et au développement durable",
+    "created_by": null,
+    "created_at": "2025-06-02T14:41:04.208875",
+    "is_system": true
+  },
+  "95a63d44-6512-4034-84f8-052fa2b71161": {
+    "id": "95a63d44-6512-4034-84f8-052fa2b71161",
+    "name": "Conformité et Réglementation",
+    "description": "Prompts pour la conformité réglementaire et les standards",
+    "created_by": null,
+    "created_at": "2025-06-02T14:41:04.208882",
+    "is_system": true
+  },
+  "b182aa4d-9b1a-434f-a5c7-dea068257102": {
+    "id": "b182aa4d-9b1a-434f-a5c7-dea068257102",
+    "name": "Gestion des Risques",
+    "description": "Prompts pour l'identification et la gestion des risques fournisseurs",
+    "created_by": null,
+    "created_at": "2025-06-02T14:41:04.208889",
+    "is_system": true
+  },
+  "9aa17b31-ea29-4d8a-a96c-01fa70a0f9f3": {
+    "id": "9aa17b31-ea29-4d8a-a96c-01fa70a0f9f3",
+    "name": "Innovation et Technologie",
+    "description": "Prompts pour identifier les innovations et nouvelles technologies",
+    "created_by": null,
+    "created_at": "2025-06-02T14:41:04.209174",
+    "is_system": true
+  },
+  "80a68f55-d0b5-418d-b392-20dbd998bb75": {
+    "id": "80a68f55-d0b5-418d-b392-20dbd998bb75",
+    "name": "Reporting et Analyse",
+    "description": "Prompts pour la création de rapports et l'analyse de données",
+    "created_by": null,
+    "created_at": "2025-06-02T14:41:04.209189",
+    "is_system": true
+  },
+  "bb4aeb25-3049-4cb0-9e1c-ecd82acf2333": {
+    "id": "bb4aeb25-3049-4cb0-9e1c-ecd82acf2333",
+    "name": "Stratégie Achats",
+    "description": "Prompts pour la stratégie et l'optimisation des achats",
+    "created_by": null,
+    "created_at": "2025-06-02T14:41:04.209196",
+    "is_system": true
+  }
+}
