@@ -6,7 +6,19 @@ import time
 from datetime import datetime
 
 class PromptAchatTester:
-    def __init__(self, base_url="https://2444bfad-255e-4dce-94ef-e2848c1c1958.preview.emergentagent.com"):
+    def __init__(self, base_url=None):
+        # Try to get the base URL from frontend/.env if not provided
+        if base_url is None:
+            try:
+                with open('/app/frontend/.env', 'r') as f:
+                    for line in f:
+                        if line.startswith('REACT_APP_BACKEND_URL='):
+                            base_url = line.strip().split('=')[1].strip('"\'')
+                            break
+            except Exception as e:
+                print(f"Error reading frontend/.env: {e}")
+                base_url = "http://localhost:8001"
+        
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.token = None
@@ -14,6 +26,10 @@ class PromptAchatTester:
         self.tests_passed = 0
         self.current_user = None
         self.created_prompt_id = None
+        self.created_resources = {
+            "llm_servers": [],
+            "categories": []
+        }
 
     def run_test(self, name, method, endpoint, expected_status, data=None, headers=None):
         """Run a single API test"""
