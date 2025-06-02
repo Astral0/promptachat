@@ -7,7 +7,11 @@ import {
   ComputerDesktopIcon,
   CheckCircleIcon,
   XCircleIcon,
-  ClockIcon
+  ClockIcon,
+  PlusIcon,
+  PencilIcon,
+  TrashIcon,
+  ServerIcon
 } from '@heroicons/react/24/outline';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -20,12 +24,26 @@ function UserSettings() {
     preferred_model: ''
   });
   const [servers, setServers] = useState({});
+  const [userServers, setUserServers] = useState([]);
+  const [allServers, setAllServers] = useState([]);
   const [serverTests, setServerTests] = useState({});
   const [models, setModels] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
   const [message, setMessage] = useState(null);
+  
+  // Modal states for user server management
+  const [showServerModal, setShowServerModal] = useState(false);
+  const [editingServer, setEditingServer] = useState(null);
+  const [serverForm, setServerForm] = useState({
+    name: '',
+    type: 'ollama',
+    url: '',
+    api_key: '',
+    default_model: '',
+    port: ''
+  });
 
   useEffect(() => {
     loadData();
@@ -33,15 +51,19 @@ function UserSettings() {
 
   const loadData = async () => {
     try {
-      const [prefsResponse, serversResponse, modelsResponse] = await Promise.all([
+      const [prefsResponse, serversResponse, modelsResponse, userServersResponse, allServersResponse] = await Promise.all([
         axios.get(`${API}/user/preferences`),
         axios.get(`${API}/llm/servers`),
-        axios.get(`${API}/llm/models`)
+        axios.get(`${API}/llm/models`),
+        axios.get(`${API}/user/llm-servers`),
+        axios.get(`${API}/user/llm-servers/all`)
       ]);
 
       setPreferences(prefsResponse.data);
       setServers(serversResponse.data);
       setModels(modelsResponse.data);
+      setUserServers(userServersResponse.data);
+      setAllServers(allServersResponse.data);
     } catch (error) {
       console.error('Error loading user settings:', error);
     } finally {
@@ -73,6 +95,18 @@ function UserSettings() {
     }
   };
 
+  const testUserServer = async (serverId) => {
+    try {
+      const response = await axios.post(`${API}/user/llm-servers/${serverId}/test`);
+      setServerTests(prev => ({
+        ...prev,
+        [serverId]: response.data
+      }));
+    } catch (error) {
+      console.error(`Error testing user server ${serverId}:`, error);
+    }
+  };
+
   const loadServerModels = async (serverName) => {
     try {
       const response = await axios.get(`${API}/llm/servers/${serverName}/models`);
@@ -97,6 +131,87 @@ function UserSettings() {
       setTimeout(() => setMessage(null), 3000);
     } finally {
       setSaving(false);
+    }
+  };
+
+  // User Server Management Functions
+  const openServerModal = (server = null) => {
+    if (server) {
+      setEditingServer(server);
+      setServerForm({
+        name: server.name,
+        type: server.type,
+        url: server.url,
+        api_key: server.api_key || '',
+        default_model: server.default_model,
+        port: server.port || ''
+      });
+    } else {
+      setEditingServer(null);
+      setServerForm({
+        name: '',
+        type: 'ollama',
+        url: '',
+        api_key: '',
+        default_model: '',
+        port: ''
+      });
+    }
+    setShowServerModal(true);
+  };
+
+  const closeServerModal = () => {
+    setShowServerModal(false);
+    setEditingServer(null);
+    setServerForm({
+      name: '',
+      type: 'ollama',
+      url: '',
+      api_key: '',
+      default_model: '',
+      port: ''
+    });
+  };
+
+  const saveUserServer = async () => {
+    try {
+      const serverData = {
+        ...serverForm,
+        port: serverForm.port ? parseInt(serverForm.port) : undefined
+      };
+
+      if (editingServer) {
+        await axios.put(`${API}/user/llm-servers/${editingServer.id}`, serverData);
+        setMessage({ type: 'success', text: 'Serveur modifié avec succès !' });
+      } else {
+        await axios.post(`${API}/user/llm-servers`, serverData);
+        setMessage({ type: 'success', text: 'Serveur ajouté avec succès !' });
+      }
+
+      closeServerModal();
+      loadData(); // Reload data
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      console.error('Error saving server:', error);
+      setMessage({ type: 'error', text: 'Erreur lors de la sauvegarde du serveur' });
+      setTimeout(() => setMessage(null), 3000);
+    }
+  };
+
+  const deleteUserServer = async (serverId) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce serveur ?')) {
+      return;
+    }
+
+    try {
+      await axios.delete(`${API}/user/llm-servers/${serverId}`);
+      setMessage({ type: 'success', text: 'Serveur supprimé avec succès !' });
+      loadData(); // Reload data
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      console.error('Error deleting server:', error);
+      setMessage({ type: 'error', text: 'Erreur lors de la suppression' });
+      setTimeout(() => setMessage(null), 3000);
     }
   };
 
@@ -140,7 +255,7 @@ function UserSettings() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Paramètres Utilisateur</h1>
@@ -201,9 +316,10 @@ function UserSettings() {
               }))}
             >
               <option value="">Aucune préférence</option>
-              {Object.entries(servers).map(([name, server]) => (
-                <option key={name} value={name}>
+              {allServers.map((server) => (
+                <option key={server.id} value={server.id}>
                   {server.name} ({server.type}) - {server.default_model}
+                  {server.is_system ? ' (Système)' : ' (Personnel)'}
                 </option>
               ))}
             </select>
@@ -255,12 +371,105 @@ function UserSettings() {
         </div>
       </div>
 
-      {/* LLM Servers Status */}
+      {/* My LLM Servers */}
+      <div className="bg-white shadow rounded-lg p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-medium text-gray-900">
+            <ServerIcon className="h-5 w-5 inline mr-2" />
+            Mes Serveurs LLM
+          </h3>
+          <button
+            onClick={() => openServerModal()}
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          >
+            <PlusIcon className="h-4 w-4 mr-2" />
+            Ajouter un serveur
+          </button>
+        </div>
+
+        {userServers.length === 0 ? (
+          <div className="text-center py-6 text-gray-500">
+            <ServerIcon className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+            <p>Aucun serveur personnel configuré</p>
+            <p className="text-sm">Ajoutez votre propre serveur LLM pour l'utiliser dans PromptAchat</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {userServers.map((server) => (
+              <div key={server.id} className="border border-gray-200 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    {getServerStatusIcon(server.id)}
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-900">
+                        {server.name}
+                      </h4>
+                      <p className="text-xs text-gray-500">
+                        {server.type} • {server.url} • {server.default_model}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs text-gray-500">
+                      {getServerStatusText(server.id)}
+                    </span>
+                    <button
+                      onClick={() => testUserServer(server.id)}
+                      className="text-xs text-blue-600 hover:text-blue-500"
+                    >
+                      Tester
+                    </button>
+                    <button
+                      onClick={() => openServerModal(server)}
+                      className="p-1 text-gray-400 hover:text-blue-600"
+                    >
+                      <PencilIcon className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => deleteUserServer(server.id)}
+                      className="p-1 text-gray-400 hover:text-red-600"
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Test details */}
+                {serverTests[server.id] && serverTests[server.id].status === 'error' && (
+                  <div className="mt-3">
+                    <p className="text-xs text-red-600">
+                      <strong>Erreur:</strong> {serverTests[server.id].message}
+                    </p>
+                  </div>
+                )}
+
+                {/* Available models */}
+                {serverTests[server.id] && serverTests[server.id].status === 'success' && 
+                 serverTests[server.id].available_models && serverTests[server.id].available_models.length > 0 && (
+                  <div className="mt-3">
+                    <p className="text-xs font-medium text-gray-700 mb-1">Modèles disponibles:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {serverTests[server.id].available_models.map(model => (
+                        <span key={model} className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-700">
+                          {model}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* System LLM Servers Status */}
       <div className="bg-white shadow rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-medium text-gray-900">
             <ComputerDesktopIcon className="h-5 w-5 inline mr-2" />
-            Serveurs LLM Disponibles
+            Serveurs LLM Système
           </h3>
           <button
             onClick={testAllServers}
@@ -337,6 +546,122 @@ function UserSettings() {
           ))}
         </div>
       </div>
+
+      {/* Server Modal */}
+      {showServerModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                {editingServer ? 'Modifier le serveur' : 'Ajouter un serveur LLM'}
+              </h3>
+              
+              <div className="space-y-4">
+                {/* Name */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Nom du serveur *
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={serverForm.name}
+                    onChange={(e) => setServerForm(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="Mon serveur LLM"
+                  />
+                </div>
+
+                {/* Type */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Type *
+                  </label>
+                  <select
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={serverForm.type}
+                    onChange={(e) => setServerForm(prev => ({ ...prev, type: e.target.value }))}
+                  >
+                    <option value="ollama">Ollama</option>
+                    <option value="openai">OpenAI Compatible</option>
+                  </select>
+                </div>
+
+                {/* URL */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    URL *
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={serverForm.url}
+                    onChange={(e) => setServerForm(prev => ({ ...prev, url: e.target.value }))}
+                    placeholder="http://localhost:11434"
+                  />
+                </div>
+
+                {/* Port */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Port (optionnel)
+                  </label>
+                  <input
+                    type="number"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={serverForm.port}
+                    onChange={(e) => setServerForm(prev => ({ ...prev, port: e.target.value }))}
+                    placeholder="11434"
+                  />
+                </div>
+
+                {/* API Key */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Clé API (si nécessaire)
+                  </label>
+                  <input
+                    type="password"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={serverForm.api_key}
+                    onChange={(e) => setServerForm(prev => ({ ...prev, api_key: e.target.value }))}
+                    placeholder="sk-..."
+                  />
+                </div>
+
+                {/* Default Model */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Modèle par défaut *
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={serverForm.default_model}
+                    onChange={(e) => setServerForm(prev => ({ ...prev, default_model: e.target.value }))}
+                    placeholder="llama3, gpt-4, etc."
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  onClick={closeServerModal}
+                  className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={saveUserServer}
+                  disabled={!serverForm.name || !serverForm.url || !serverForm.default_model}
+                  className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {editingServer ? 'Modifier' : 'Ajouter'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
