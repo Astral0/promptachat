@@ -22,12 +22,14 @@ class ConfidentialityLevel(str, Enum):
 # Prompt Models
 class PromptBase(BaseModel):
     title: str
+    description: Optional[str] = ""
     content: str
     variables: List[str] = []
     accepts_files: bool = False
-    needs_cockpit: bool = False
+    uses_cockpit_data: bool = False  # Changed from needs_cockpit
     category: str = "General"
     welcome_page_html: str = ""
+    is_system: bool = False  # Added for system prompts
 
 class SystemPrompt(PromptBase):
     id: str
