@@ -149,7 +149,7 @@ backend:
     status_history:
       - working: false
         agent: "testing"
-        comment: "Only found 2 prompts in the system, expected at least 20. No prompts found in the specified categories (Évaluation Fournisseur, Négociation, Analyse Contractuelle, etc.)"
+        comment: "Only found 2 prompts in the system, expected at least 20. No prompts found in the specified categories (Évaluation Fournisseur, Négociation, Analyse Contractuelle, etc.). The 20 new prompts mentioned in the requirements don't appear to have been implemented yet or they haven't been properly added to the database."
 
 metadata:
   created_by: "testing_agent"
