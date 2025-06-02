@@ -958,6 +958,203 @@ async def import_new_prompts(admin_user: User = Depends(get_admin_user)):
         raise HTTPException(status_code=500, detail=f"Erreur lors de l'import: {str(e)}")
 
 # ===============================
+# Prompt Execution Routes
+# ===============================
+
+@api_router.post("/prompts/{prompt_id}/validate")
+async def validate_prompt_execution(
+    prompt_id: str,
+    variables: List[PromptVariable],
+    current_user: User = Depends(get_current_user)
+):
+    """Validate prompt execution variables."""
+    # Get prompt
+    prompt = prompt_service.get_prompt(prompt_id, current_user.id)
+    if not prompt:
+        raise HTTPException(status_code=404, detail="Prompt non trouvé")
+    
+    # Validate variables
+    validation = prompt_execution_service.validate_variables(prompt.content, variables)
+    
+    return validation
+
+@api_router.post("/prompts/{prompt_id}/build-final")
+async def build_final_prompt(
+    prompt_id: str,
+    request: PromptExecutionRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Build the final prompt with variables and files substituted."""
+    # Get prompt
+    prompt = prompt_service.get_prompt(prompt_id, current_user.id)
+    if not prompt:
+        raise HTTPException(status_code=404, detail="Prompt non trouvé")
+    
+    # Use modified content if provided, otherwise use original
+    content = request.modified_content or prompt.content
+    
+    # Build final prompt
+    final_prompt, logs = prompt_execution_service.build_final_prompt(
+        content,
+        request.variables,
+        request.files
+    )
+    
+    return {
+        "original_content": prompt.content,
+        "modified_content": request.modified_content,
+        "final_prompt": final_prompt,
+        "logs": logs
+    }
+
+@api_router.post("/prompts/{prompt_id}/execute")
+async def execute_prompt(
+    prompt_id: str,
+    request: PromptExecutionRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Execute a prompt with full logging."""
+    # Get prompt
+    prompt = prompt_service.get_prompt(prompt_id, current_user.id)
+    if not prompt:
+        raise HTTPException(status_code=404, detail="Prompt non trouvé")
+    
+    # Use modified content if provided, otherwise use original
+    content = request.modified_content or prompt.content
+    
+    # Validate variables first
+    validation = prompt_execution_service.validate_variables(content, request.variables)
+    if not validation["is_valid"]:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Variables manquantes: {', '.join(validation['missing_variables'])}"
+        )
+    
+    # Get server configuration
+    server_config = None
+    
+    if request.server_id:
+        if request.server_id.startswith("system_"):
+            # System server
+            server_name = request.server_id[7:]  # Remove "system_" prefix
+            server_config = admin_llm_server_service.get_server(server_name)
+        else:
+            # User server
+            user_server = user_llm_server_service.get_server(request.server_id, current_user.id)
+            if user_server:
+                server_config = {
+                    "type": user_server.type,
+                    "url": user_server.url,
+                    "api_key": user_server.api_key,
+                    "default_model": user_server.default_model
+                }
+    
+    if not server_config:
+        # Use default system server
+        servers = admin_llm_server_service.get_all_servers()
+        if not servers:
+            raise HTTPException(status_code=500, detail="Aucun serveur LLM disponible")
+        server_config = servers[0]
+    
+    # Execute prompt
+    result = await prompt_execution_service.execute_prompt(
+        request,
+        prompt.content,
+        server_config
+    )
+    
+    return result
+
+@api_router.get("/prompts/executions/{execution_id}")
+async def get_execution_result(
+    execution_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get execution result by ID."""
+    result = prompt_execution_service.get_execution_result(execution_id)
+    if not result:
+        raise HTTPException(status_code=404, detail="Résultat d'exécution non trouvé")
+    
+    return result
+
+@api_router.get("/prompts/{prompt_id}/stream")
+async def stream_prompt_execution(
+    prompt_id: str,
+    variables: str = "",  # JSON encoded variables
+    modified_content: str = "",
+    files: str = "",  # JSON encoded files
+    server_id: str = "",
+    model: str = "",
+    current_user: User = Depends(get_current_user)
+):
+    """Stream prompt execution results."""
+    from fastapi.responses import StreamingResponse
+    import json
+    
+    # Get prompt
+    prompt = prompt_service.get_prompt(prompt_id, current_user.id)
+    if not prompt:
+        raise HTTPException(status_code=404, detail="Prompt non trouvé")
+    
+    # Parse parameters
+    try:
+        variables_list = json.loads(variables) if variables else []
+        files_list = json.loads(files) if files else []
+        variables_obj = [PromptVariable(**var) for var in variables_list]
+    except:
+        variables_obj = []
+        files_list = []
+    
+    # Use modified content if provided
+    content = modified_content or prompt.content
+    
+    # Get server configuration
+    server_config = None
+    if server_id:
+        if server_id.startswith("system_"):
+            server_name = server_id[7:]
+            server_config = admin_llm_server_service.get_server(server_name)
+        else:
+            user_server = user_llm_server_service.get_server(server_id, current_user.id)
+            if user_server:
+                server_config = {
+                    "type": user_server.type,
+                    "url": user_server.url,
+                    "api_key": user_server.api_key,
+                    "default_model": user_server.default_model
+                }
+    
+    if not server_config:
+        servers = admin_llm_server_service.get_all_servers()
+        if servers:
+            server_config = servers[0]
+    
+    if not server_config:
+        raise HTTPException(status_code=500, detail="Aucun serveur LLM disponible")
+    
+    # Build final prompt
+    final_prompt, _ = prompt_execution_service.build_final_prompt(
+        content,
+        variables_obj,
+        files_list
+    )
+    
+    # Determine model
+    final_model = model or server_config.get('default_model', 'llama3')
+    
+    # Stream execution
+    async def generate():
+        async for chunk in prompt_execution_service.execute_prompt_streaming(
+            final_prompt,
+            server_config,
+            final_model
+        ):
+            yield f"data: {json.dumps({'chunk': chunk})}\n\n"
+        yield f"data: {json.dumps({'done': True})}\n\n"
+    
+    return StreamingResponse(generate(), media_type="text/plain")
+
+# ===============================
 # Health Check Routes
 # ===============================
 
