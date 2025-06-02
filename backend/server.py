@@ -47,6 +47,7 @@ cockpit_service = CockpitService()
 user_llm_server_service = UserLLMServerService()
 category_service = CategoryService()
 admin_llm_server_service = AdminLLMServerService()
+prompt_execution_service = PromptExecutionService()
 
 # Create the main app
 app = FastAPI(
