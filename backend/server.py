@@ -1020,7 +1020,7 @@ async def execute_prompt(
         raise HTTPException(status_code=404, detail="Prompt non trouvé")
     
     # Use modified content if provided, otherwise use original
-    content = request.modified_content or prompt.content
+    content = request.modified_content or prompt['content']
     
     # Validate variables first
     validation = prompt_execution_service.validate_variables(content, request.variables)
