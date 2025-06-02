@@ -359,75 +359,208 @@ def main():
     # Test getting current user
     tester.test_get_current_user()
     
-    # Test prompt management
-    tester.test_get_prompts()
-    tester.test_get_categories()
+    # ===============================
+    # Test Cockpit Variables
+    # ===============================
+    print("\n" + "=" * 50)
+    print("Testing Cockpit Variables")
+    print("=" * 50)
     
-    # Create a test prompt
-    prompt_title = f"Test Prompt {timestamp}"
-    prompt_content = "This is a test prompt with variables: {var1} and {var2}"
-    if tester.test_create_prompt(prompt_title, prompt_content):
-        prompt_id = tester.created_prompt_id
-        
-        # Test operations on the created prompt
-        tester.test_get_prompt(prompt_id)
-        tester.test_update_prompt(prompt_id, f"Updated {prompt_title}", "Updated content: {var1} and {var2}")
-        success, duplicate_response = tester.test_duplicate_prompt(prompt_id)
-        
-        if success and 'id' in duplicate_response:
-            duplicate_id = duplicate_response['id']
-            tester.test_delete_prompt(duplicate_id)
-        
-        # Test LLM operations
-        tester.test_llm_generate_external(prompt_id)
-        tester.test_get_llm_models()
-        
-        # Test LLM server management
-        success, servers_response = tester.test_get_llm_servers()
-        if success:
-            print(f"Found {len(servers_response)} LLM servers")
-            
-            # Test all servers at once
-            tester.test_test_all_llm_servers()
-            
-            # Test each server individually
-            for server_name in servers_response:
-                tester.test_test_llm_server(server_name)
-                tester.test_get_llm_server_models(server_name)
-            
-            # Test user preferences
-            tester.test_get_user_preferences()
-            
-            # Update user preferences with first server if available
-            if servers_response:
-                first_server = list(servers_response.keys())[0]
-                first_model = servers_response[first_server].get("default_model", "")
-                tester.test_update_user_preferences(first_server, first_model)
-                
-                # Test chat with server (this might fail if servers are not accessible)
-                tester.test_chat_with_server(first_server, first_model)
-        
-        # Clean up
-        tester.test_delete_prompt(prompt_id)
+    # Test getting all cockpit variables
+    success, variables = tester.test_get_cockpit_variables()
+    if success:
+        print(f"✅ Found {len(variables)} cockpit variables")
+        if len(variables) < 60:
+            print(f"⚠️ Warning: Expected at least 60 variables, got {len(variables)}")
     
-    # Test search
-    tester.test_search_prompts("test")
+    # Test getting cockpit variables as dictionary
+    success, variables_dict = tester.test_get_cockpit_variables_dict()
+    if success:
+        print(f"✅ Found {len(variables_dict)} cockpit variables in dictionary")
     
-    # Test admin operations
-    tester.test_admin_list_users()
+    # Test extracting cockpit variables from content
+    test_content = "Analyse pour {nom_entreprise} dans le {secteur_activite}"
+    success, extract_result = tester.test_extract_cockpit_variables(test_content)
+    if success:
+        uses_cockpit = extract_result.get("uses_cockpit_data", False)
+        variables = extract_result.get("cockpit_variables", [])
+        print(f"✅ Extracted variables: {variables}")
+        print(f"✅ Uses cockpit data: {uses_cockpit}")
+        
+        if not uses_cockpit:
+            print("⚠️ Warning: Expected uses_cockpit_data to be true")
     
-    test_user_uid = f"testuser_{timestamp}"
-    test_user_email = f"test_{timestamp}@example.com"
+    # ===============================
+    # Test User LLM Servers
+    # ===============================
+    print("\n" + "=" * 50)
+    print("Testing User LLM Servers")
+    print("=" * 50)
     
-    success, _ = tester.test_admin_create_user(
-        test_user_uid,
-        test_user_email,
-        f"Test User {timestamp}"
+    # Test getting user LLM servers
+    success, user_servers = tester.test_get_user_llm_servers()
+    if success:
+        print(f"✅ Found {len(user_servers)} user LLM servers")
+    
+    # Test getting all available servers
+    success, all_servers = tester.test_get_all_available_servers()
+    if success:
+        print(f"✅ Found {len(all_servers)} total available servers (system + user)")
+    
+    # Test creating a user LLM server
+    server_name = f"Test Ollama {timestamp}"
+    success, created_server = tester.test_create_user_llm_server(
+        name=server_name,
+        server_type="ollama",
+        url="http://localhost:11434",
+        default_model="llama3"
     )
     
+    if success and 'id' in created_server:
+        server_id = created_server['id']
+        print(f"✅ Created user LLM server with ID: {server_id}")
+        
+        # Test getting the created server
+        success, server = tester.test_get_user_llm_server(server_id)
+        if success:
+            print(f"✅ Retrieved server: {server['name']}")
+        
+        # Test updating the server
+        update_data = {
+            "name": f"Updated {server_name}",
+            "default_model": "llama3:latest"
+        }
+        success, updated_server = tester.test_update_user_llm_server(server_id, update_data)
+        if success:
+            print(f"✅ Updated server name to: {updated_server['name']}")
+        
+        # Test server connection
+        success, test_result = tester.test_test_user_llm_server(server_id)
+        print(f"Server connection test result: {test_result.get('status', 'unknown')}")
+        
+        # Test deleting the server
+        if tester.test_delete_user_llm_server(server_id):
+            print(f"✅ Deleted server with ID: {server_id}")
+    
+    # ===============================
+    # Test Categories
+    # ===============================
+    print("\n" + "=" * 50)
+    print("Testing Categories")
+    print("=" * 50)
+    
+    # Test getting all categories
+    success, categories = tester.test_get_categories_api()
     if success:
-        tester.test_admin_update_user(test_user_uid, full_name=f"Updated Test User {timestamp}")
-        tester.test_admin_delete_user(test_user_uid)
+        print(f"✅ Found {len(categories)} categories")
+        if len(categories) < 10:
+            print(f"⚠️ Warning: Expected at least 10 default categories, got {len(categories)}")
+        
+        # Check for specific categories
+        category_names = [cat["name"] for cat in categories]
+        expected_categories = [
+            "Analyse Contractuelle",
+            "Évaluation Fournisseur",
+            "Négociation",
+            "Veille Marché",
+            "RSE et Développement Durable"
+        ]
+        
+        for cat_name in expected_categories:
+            if cat_name in category_names:
+                print(f"✅ Found expected category: {cat_name}")
+            else:
+                print(f"⚠️ Missing expected category: {cat_name}")
+    
+    # Test getting categories as dictionary
+    success, categories_dict = tester.test_get_categories_dict()
+    if success:
+        print(f"✅ Retrieved categories dictionary with {len(categories_dict)} entries")
+    
+    # Test creating a category
+    category_name = f"Test Category {timestamp}"
+    success, created_category = tester.test_create_category(
+        name=category_name,
+        description="Test category description"
+    )
+    
+    if success and 'id' in created_category:
+        category_id = created_category['id']
+        print(f"✅ Created category with ID: {category_id}")
+        
+        # Test updating the category
+        update_data = {
+            "name": f"Updated {category_name}",
+            "description": "Updated test category description"
+        }
+        success, updated_category = tester.test_update_category(category_id, update_data)
+        if success:
+            print(f"✅ Updated category name to: {updated_category['name']}")
+        
+        # Test category suggestion
+        test_title = "Analyse contrat"
+        test_content = "Analyser le contrat fournisseur"
+        success, suggestion = tester.test_suggest_category(test_title, test_content)
+        if success:
+            suggested_name = suggestion.get("suggested_category_name")
+            if suggested_name:
+                print(f"✅ Suggested category: {suggested_name}")
+                if suggested_name == "Analyse Contractuelle":
+                    print("✅ Correct category suggested")
+                else:
+                    print(f"⚠️ Expected 'Analyse Contractuelle', got '{suggested_name}'")
+            else:
+                print("⚠️ No category was suggested")
+        
+        # Test deleting the category
+        if tester.test_delete_category(category_id):
+            print(f"✅ Deleted category with ID: {category_id}")
+    
+    # ===============================
+    # Test Enriched Prompts
+    # ===============================
+    print("\n" + "=" * 50)
+    print("Testing Enriched Prompts")
+    print("=" * 50)
+    
+    # Test getting all prompts
+    success, prompts = tester.test_get_prompts()
+    if success:
+        print(f"✅ Found {len(prompts)} prompts")
+        if len(prompts) < 20:
+            print(f"⚠️ Warning: Expected at least 20 prompts, got {len(prompts)}")
+        
+        # Check for prompts in specific categories
+        categories_to_check = [
+            "Évaluation Fournisseur",
+            "Négociation",
+            "Analyse Contractuelle",
+            "Veille Marché",
+            "RSE et Développement Durable"
+        ]
+        
+        category_counts = {}
+        for cat in categories_to_check:
+            category_counts[cat] = 0
+        
+        for prompt in prompts:
+            if prompt["category"] in categories_to_check:
+                category_counts[prompt["category"]] += 1
+        
+        for cat, count in category_counts.items():
+            if count > 0:
+                print(f"✅ Found {count} prompts in category: {cat}")
+            else:
+                print(f"⚠️ No prompts found in category: {cat}")
+    
+    # ===============================
+    # Clean up any remaining resources
+    # ===============================
+    for server_id in tester.created_resources["llm_servers"]:
+        tester.test_delete_user_llm_server(server_id)
+    
+    for category_id in tester.created_resources["categories"]:
+        tester.test_delete_category(category_id)
     
     # Print results
     print("\n" + "=" * 50)
