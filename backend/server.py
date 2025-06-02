@@ -1001,7 +1001,7 @@ async def build_final_prompt(
     )
     
     return {
-        "original_content": prompt.content,
+        "original_content": prompt['content'],
         "modified_content": request.modified_content,
         "final_prompt": final_prompt,
         "logs": logs
