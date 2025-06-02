@@ -57,17 +57,29 @@ class PromptService:
         try:
             with open(self.system_prompts_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
+            
+            # Handle both old format and new format
+            if 'system_prompts' in data:
+                # New format with all prompts in system_prompts array
+                all_prompts = data['system_prompts']
+            else:
+                # Old format with separate internal/external arrays
+                all_prompts = data.get('internal', []) + data.get('external', [])
+            
+            prompts = {"internal": [], "external": []}
+            
+            for prompt in all_prompts:
+                prompt_type = prompt.get('type', 'internal')
+                if prompt_type not in prompts:
+                    prompts[prompt_type] = []
                 
-            prompts = {}
-            for prompt_type in ['internal', 'external']:
-                prompts[prompt_type] = [
+                prompts[prompt_type].append(
                     SystemPrompt(
                         id=prompt['id'],
                         type=PromptType(prompt_type),
-                        **{k: v for k, v in prompt.items() if k != 'id'}
+                        **{k: v for k, v in prompt.items() if k not in ['id', 'type']}
                     )
-                    for prompt in data.get(prompt_type, [])
-                ]
+                )
             
             return prompts
         except Exception as e:
