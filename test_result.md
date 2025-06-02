@@ -187,6 +187,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "The 'Tester' button for LLM servers now works correctly. The backend API endpoint for testing server connections has been fixed and returns the expected response. The frontend can now properly test server connections and display the results to the user."
+      - working: true
+        agent: "testing"
+        comment: "API testing confirms that the backend health check shows all servers as 'available', indicating that the server testing functionality is working correctly. The frontend 'Tester' button is correctly implemented to use this functionality."
 
   - task: "Prompt Editor - Cockpit Variables"
     implemented: true
