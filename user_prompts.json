@@ -92,6 +92,23 @@
       "updated_at": "2025-06-02 15:59:50.877004",
       "is_public": false,
       "based_on_system_prompt": null
+    },
+    {
+      "title": "test",
+      "description": "",
+      "content": "dis {chiffre_affaires}\nHello\n\n{secteur_activite}\n\n{nom_entreprise}",
+      "variables": [],
+      "accepts_files": false,
+      "uses_cockpit_data": true,
+      "category": "Gestion des Risques",
+      "welcome_page_html": "yest",
+      "is_system": false,
+      "id": "addb89f3-f48b-48ab-a62b-ce812f37aa8d",
+      "created_by": "_HkHVhXpcT80xLkhdhuHlQ",
+      "created_at": "2025-06-02 16:10:03.573705",
+      "updated_at": "2025-06-02 16:10:03.573706",
+      "is_public": false,
+      "based_on_system_prompt": null
     }
   ],
   "external": []
