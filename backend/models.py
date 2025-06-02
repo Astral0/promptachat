@@ -233,8 +233,50 @@ class CockpitVariable(BaseModel):
     label: str
     description: Optional[str] = None
 
-# Category Models
-class Category(BaseModel):
+# Admin LLM Server Models (pour la gestion par les administrateurs)
+class AdminLLMServerCreate(BaseModel):
+    name: str
+    type: str  # "ollama" or "openai"
+    url: str
+    api_key: Optional[str] = None
+    default_model: str
+
+class AdminLLMServerUpdate(BaseModel):
+    name: Optional[str] = None
+    type: Optional[str] = None
+    url: Optional[str] = None
+    api_key: Optional[str] = None
+    default_model: Optional[str] = None
+
+# Prompt Execution Models
+class PromptVariable(BaseModel):
+    name: str
+    value: str
+    is_cockpit: bool = False
+
+class PromptExecutionRequest(BaseModel):
+    prompt_id: str
+    variables: List[PromptVariable] = []
+    modified_content: Optional[str] = None
+    files: List[str] = []  # Base64 encoded files
+    server_id: Optional[str] = None
+    model: Optional[str] = None
+
+class PromptExecutionLog(BaseModel):
+    timestamp: datetime
+    action: str  # "variable_substitution", "file_processing", "api_call", "response"
+    details: str
+    success: bool = True
+
+class PromptExecutionResult(BaseModel):
+    execution_id: str
+    prompt_id: str
+    final_prompt: str
+    result: str
+    logs: List[PromptExecutionLog]
+    execution_time: float
+    tokens_used: Optional[int] = None
+    cost: Optional[float] = None
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     description: Optional[str] = None
