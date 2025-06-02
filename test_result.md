@@ -159,15 +159,18 @@ backend:
 
   - task: "Advanced Prompt Execution"
     implemented: true
-    working: false
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "testing"
         comment: "The POST /api/prompts/{prompt_id}/validate endpoint returns a 500 Internal Server Error. The error is 'AttributeError: 'PromptService' object has no attribute 'get_prompt'' - it seems the method is called 'get_prompt_by_id' instead of 'get_prompt'. This needs to be fixed in the validate_prompt_execution function in server.py."
+      - working: true
+        agent: "testing"
+        comment: "Successfully tested the Advanced Prompt Execution functionality. GET /api/prompts returns the list of available prompts correctly. POST /api/prompts/{prompt_id}/validate successfully validates the variables for a prompt. POST /api/prompts/{prompt_id}/build-final correctly builds the final prompt with the provided variables and modified content. All issues have been fixed and the functionality is working as expected."
 
 frontend:
   - task: "Settings Page - LLM Servers Section"
