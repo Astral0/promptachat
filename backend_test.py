@@ -4,9 +4,16 @@ import json
 import time
 import sys
 from pprint import pprint
+import os
+from dotenv import load_dotenv
+from pathlib import Path
+
+# Load environment variables
+load_dotenv(Path('/app/frontend/.env'))
 
 # Configuration
-BASE_URL = "http://localhost:8001/api"
+BACKEND_URL = os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:8001')
+BASE_URL = f"{BACKEND_URL}/api"
 AUTH_CREDENTIALS = {
     "uid": "admin",
     "password": "admin"
