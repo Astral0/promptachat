@@ -232,6 +232,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Successfully verified the real-time preview functionality. Clicking the 'Aperçu' button shows a preview of the prompt with the correct title and content."
+      - working: true
+        agent: "testing"
+        comment: "API testing confirms that the Prompts API correctly handles prompt content and variables. Created a new prompt 'Test Prompt API' with Cockpit variables via the API, which was then visible in the list of prompts."
 
   - task: "Prompt Library - Display and Filtering"
     implemented: true
