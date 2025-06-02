@@ -98,7 +98,7 @@ def test_enriched_prompts(token):
         # Check for specific categories
         categories = set()
         for prompt in prompts:
-            if "category" in prompt:
+            if isinstance(prompt, dict) and "category" in prompt:
                 categories.add(prompt["category"])
         
         print(f"\nFound {len(categories)} categories:")
@@ -115,7 +115,7 @@ def test_enriched_prompts(token):
         
         print("\nChecking for prompts in required categories:")
         for category in required_categories:
-            category_prompts = [p for p in prompts if p.get("category") == category]
+            category_prompts = [p for p in prompts if isinstance(p, dict) and p.get("category") == category]
             if category_prompts:
                 print(f"✅ Found {len(category_prompts)} prompts in category '{category}'")
                 # Print first prompt title in this category
