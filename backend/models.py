@@ -46,10 +46,11 @@ class UserPrompt(PromptBase):
 
 class UserPromptCreate(BaseModel):
     title: str
+    description: Optional[str] = ""
     content: str
     variables: List[str] = []
     accepts_files: bool = False
-    needs_cockpit: bool = False
+    uses_cockpit_data: bool = False  # Changed from needs_cockpit
     category: str = "General"
     welcome_page_html: str = ""
     type: PromptType
@@ -58,12 +59,14 @@ class UserPromptCreate(BaseModel):
 
 class UserPromptUpdate(BaseModel):
     title: Optional[str] = None
+    description: Optional[str] = None
     content: Optional[str] = None
     variables: Optional[List[str]] = None
     accepts_files: Optional[bool] = None
-    needs_cockpit: Optional[bool] = None
+    uses_cockpit_data: Optional[bool] = None  # Changed from needs_cockpit
     category: Optional[str] = None
     welcome_page_html: Optional[str] = None
+    type: Optional[PromptType] = None
     is_public: Optional[bool] = None
 
 # User Models
