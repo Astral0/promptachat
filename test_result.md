@@ -125,7 +125,7 @@ backend:
     status_history:
       - working: false
         agent: "testing"
-        comment: "Basic CRUD operations (GET, POST, PUT, DELETE) for user LLM servers work correctly, but GET /api/user/llm-servers/all and POST /api/user/llm-servers/{id}/test endpoints return 500 Internal Server Error"
+        comment: "Basic CRUD operations (GET, POST, PUT, DELETE) for user LLM servers work correctly, but GET /api/user/llm-servers/all and POST /api/user/llm-servers/{id}/test endpoints return 500 Internal Server Error. The error in get_all_available_servers is 'AttributeError: 'LLMServerManager' object has no attribute 'get_all_servers'' - the method exists but is named 'get_servers' instead. The error in test_server_connection is 'RuntimeError: asyncio.run() cannot be called from a running event loop' - needs to be fixed to properly handle async operations in FastAPI."
 
   - task: "Categories API"
     implemented: true
