@@ -544,8 +544,11 @@ def main():
             category_counts[cat] = 0
         
         for prompt in prompts:
-            if prompt["category"] in categories_to_check:
-                category_counts[prompt["category"]] += 1
+            # Check if prompt is a dictionary and has a category field
+            if isinstance(prompt, dict) and "category" in prompt:
+                if prompt["category"] in categories_to_check:
+                    category_counts[prompt["category"]] += 1
+        
         
         for cat, count in category_counts.items():
             if count > 0:
