@@ -39,6 +39,9 @@ FILES_DIR.mkdir(exist_ok=True)
 auth_service = AuthService()
 prompt_service = PromptService()
 llm_service = LLMService()
+cockpit_service = CockpitService()
+user_llm_server_service = UserLLMServerService()
+category_service = CategoryService()
 
 # Create the main app
 app = FastAPI(
