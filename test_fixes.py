@@ -219,6 +219,7 @@ def test_prompt_execution(token):
     # Test POST /api/prompts/{prompt_id}/build-final
     print_info(f"\nTesting POST /api/prompts/{prompt_id}/build-final with modified content")
     request_data = {
+        "prompt_id": prompt_id,
         "variables": test_variables,
         "files": [],
         "modified_content": modified_content or prompt_content + "\n\nThis is modified content for testing."
