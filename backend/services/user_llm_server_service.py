@@ -208,7 +208,7 @@ class UserLLMServerService:
         
         # Add system servers
         system_manager = LLMServerManager()
-        system_servers = system_manager.get_all_servers()
+        system_servers = system_manager.get_servers()  # Changed from get_all_servers
         
         for name, server in system_servers.items():
             all_servers.append({
