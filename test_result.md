@@ -101,3 +101,72 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+backend:
+  - task: "Cockpit Variables API"
+    implemented: true
+    working: true
+    file: "/app/backend/services/cockpit_service.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Successfully tested GET /api/cockpit/variables (returned 66 variables), GET /api/cockpit/variables/dict (returned dictionary with 66 entries), and POST /api/cockpit/extract-variables (correctly extracted variables and returned uses_cockpit_data: true)"
+
+  - task: "User LLM Servers API"
+    implemented: true
+    working: false
+    file: "/app/backend/services/user_llm_server_service.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Basic CRUD operations (GET, POST, PUT, DELETE) for user LLM servers work correctly, but GET /api/user/llm-servers/all and POST /api/user/llm-servers/{id}/test endpoints return 500 Internal Server Error"
+
+  - task: "Categories API"
+    implemented: true
+    working: true
+    file: "/app/backend/services/category_service.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Successfully tested all category endpoints: GET /api/categories (returned 10 default categories), GET /api/categories/dict, POST /api/categories, PUT /api/categories/{id}, POST /api/categories/suggest (correctly suggested 'Analyse Contractuelle'), and DELETE /api/categories/{id}"
+
+  - task: "Enriched Prompts"
+    implemented: false
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Only found 2 prompts in the system, expected at least 20. No prompts found in the specified categories (Évaluation Fournisseur, Négociation, Analyse Contractuelle, etc.)"
+
+metadata:
+  created_by: "testing_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "User LLM Servers API"
+    - "Enriched Prompts"
+  stuck_tasks:
+    - "User LLM Servers API"
+    - "Enriched Prompts"
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "testing"
+    message: "Tested all new backend features. Cockpit Variables API and Categories API are working correctly. User LLM Servers API has issues with the /all and /test endpoints. Enriched Prompts feature appears to be incomplete - only 2 prompts found instead of the expected 20+."
