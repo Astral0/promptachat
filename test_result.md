@@ -217,6 +217,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Successfully verified the ability to create new categories from the Prompt Editor. The modal appears with fields for name and description. After creation, the new category is automatically selected."
+      - working: true
+        agent: "testing"
+        comment: "API testing confirms that the Categories API supports creating new categories. Successfully created a new category 'Test Category API' via the API, which was then visible in the list of categories."
 
   - task: "Prompt Editor - Real-time Preview"
     implemented: true
