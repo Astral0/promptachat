@@ -1092,7 +1092,7 @@ async def stream_prompt_execution(
     import json
     
     # Get prompt
-    prompt = prompt_service.get_prompt(prompt_id, current_user.id)
+    prompt = prompt_service.get_prompt_by_id(prompt_id, current_user.id)
     if not prompt:
         raise HTTPException(status_code=404, detail="Prompt non trouvé")
     
