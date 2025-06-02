@@ -235,6 +235,109 @@ class PromptAchatTester:
         }
         endpoint = f"llm/chat/server?server_name={server_name}&model={model}"
         return self.run_test(f"Chat with Server {server_name} using {model}", "POST", endpoint, 200, data=data)
+        
+    # ===============================
+    # Cockpit Variables Tests
+    # ===============================
+    
+    def test_get_cockpit_variables(self):
+        """Test GET /api/cockpit/variables."""
+        return self.run_test("Get Cockpit Variables", "GET", "cockpit/variables", 200)
+    
+    def test_get_cockpit_variables_dict(self):
+        """Test GET /api/cockpit/variables/dict."""
+        return self.run_test("Get Cockpit Variables Dict", "GET", "cockpit/variables/dict", 200)
+    
+    def test_extract_cockpit_variables(self, content):
+        """Test POST /api/cockpit/extract-variables."""
+        data = {"content": content}
+        return self.run_test("Extract Cockpit Variables", "POST", "cockpit/extract-variables", 200, data=data)
+    
+    # ===============================
+    # User LLM Servers Tests
+    # ===============================
+    
+    def test_get_user_llm_servers(self):
+        """Test GET /api/user/llm-servers."""
+        return self.run_test("Get User LLM Servers", "GET", "user/llm-servers", 200)
+    
+    def test_get_all_available_servers(self):
+        """Test GET /api/user/llm-servers/all."""
+        return self.run_test("Get All Available Servers", "GET", "user/llm-servers/all", 200)
+    
+    def test_create_user_llm_server(self, name, server_type, url, default_model, api_key=None):
+        """Test POST /api/user/llm-servers."""
+        data = {
+            "name": name,
+            "type": server_type,
+            "url": url,
+            "default_model": default_model
+        }
+        if api_key:
+            data["api_key"] = api_key
+            
+        success, response = self.run_test("Create User LLM Server", "POST", "user/llm-servers", 200, data=data)
+        if success and 'id' in response:
+            self.created_resources["llm_servers"].append(response['id'])
+        return success, response
+    
+    def test_get_user_llm_server(self, server_id):
+        """Test GET /api/user/llm-servers/{server_id}."""
+        return self.run_test(f"Get User LLM Server {server_id}", "GET", f"user/llm-servers/{server_id}", 200)
+    
+    def test_update_user_llm_server(self, server_id, updates):
+        """Test PUT /api/user/llm-servers/{server_id}."""
+        return self.run_test(f"Update User LLM Server {server_id}", "PUT", f"user/llm-servers/{server_id}", 200, data=updates)
+    
+    def test_test_user_llm_server(self, server_id):
+        """Test POST /api/user/llm-servers/{server_id}/test."""
+        return self.run_test(f"Test User LLM Server {server_id}", "POST", f"user/llm-servers/{server_id}/test", 200)
+    
+    def test_delete_user_llm_server(self, server_id):
+        """Test DELETE /api/user/llm-servers/{server_id}."""
+        success, _ = self.run_test(f"Delete User LLM Server {server_id}", "DELETE", f"user/llm-servers/{server_id}", 200)
+        if success and server_id in self.created_resources["llm_servers"]:
+            self.created_resources["llm_servers"].remove(server_id)
+        return success
+    
+    # ===============================
+    # Categories Tests
+    # ===============================
+    
+    def test_get_categories_api(self):
+        """Test GET /api/categories."""
+        return self.run_test("Get Categories API", "GET", "categories", 200)
+    
+    def test_get_categories_dict(self):
+        """Test GET /api/categories/dict."""
+        return self.run_test("Get Categories Dict", "GET", "categories/dict", 200)
+    
+    def test_create_category(self, name, description=None):
+        """Test POST /api/categories."""
+        data = {"name": name}
+        if description:
+            data["description"] = description
+            
+        success, response = self.run_test("Create Category", "POST", "categories", 200, data=data)
+        if success and 'id' in response:
+            self.created_resources["categories"].append(response['id'])
+        return success, response
+    
+    def test_update_category(self, category_id, updates):
+        """Test PUT /api/categories/{category_id}."""
+        return self.run_test(f"Update Category {category_id}", "PUT", f"categories/{category_id}", 200, data=updates)
+    
+    def test_suggest_category(self, title, content):
+        """Test POST /api/categories/suggest."""
+        data = {"title": title, "content": content}
+        return self.run_test("Suggest Category", "POST", "categories/suggest", 200, data=data)
+    
+    def test_delete_category(self, category_id):
+        """Test DELETE /api/categories/{category_id}."""
+        success, _ = self.run_test(f"Delete Category {category_id}", "DELETE", f"categories/{category_id}", 200)
+        if success and category_id in self.created_resources["categories"]:
+            self.created_resources["categories"].remove(category_id)
+        return success
 
 def main():
     # Setup
