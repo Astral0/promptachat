@@ -20,12 +20,15 @@ from backend.models import (
     ChatRequest, LLMRequest, PromptExecutionResult,
     LLMServerConfig, LLMServerTest, UserPreferences,
     UserLLMServer, UserLLMServerCreate, UserLLMServerUpdate,
-    CockpitVariable, Category, CategoryCreate, CategoryUpdate
+    CockpitVariable, Category, CategoryCreate, CategoryUpdate,
+    AdminLLMServerCreate, AdminLLMServerUpdate,
+    PromptVariable, PromptExecutionRequest, PromptExecutionLog
 )
 from backend.services import AuthService, PromptService, LLMService
 from backend.services.cockpit_service import CockpitService
 from backend.services.user_llm_server_service import UserLLMServerService  
 from backend.services.category_service import CategoryService
+from backend.services.admin_llm_server_service import AdminLLMServerService
 from backend.config import get_app_config, get_database_config
 
 ROOT_DIR = Path(__file__).parent
