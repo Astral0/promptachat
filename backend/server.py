@@ -991,7 +991,7 @@ async def build_final_prompt(
         raise HTTPException(status_code=404, detail="Prompt non trouvé")
     
     # Use modified content if provided, otherwise use original
-    content = request.modified_content or prompt.content
+    content = request.modified_content or prompt['content']
     
     # Build final prompt
     final_prompt, logs = prompt_execution_service.build_final_prompt(
