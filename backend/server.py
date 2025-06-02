@@ -870,6 +870,66 @@ async def suggest_category(data: Dict[str, str]):
     return {"suggested_category_id": None, "suggested_category_name": None}
 
 # ===============================
+# Admin LLM Server Routes
+# ===============================
+
+@api_router.get("/admin/llm-servers")
+async def get_admin_llm_servers(admin_user: User = Depends(get_admin_user)):
+    """Get all system LLM servers (admin only)."""
+    return admin_llm_server_service.get_all_servers()
+
+@api_router.post("/admin/llm-servers")
+async def create_admin_llm_server(
+    server_data: AdminLLMServerCreate,
+    admin_user: User = Depends(get_admin_user)
+):
+    """Create a new system LLM server (admin only)."""
+    return admin_llm_server_service.create_server(server_data.dict())
+
+@api_router.get("/admin/llm-servers/{server_id}")
+async def get_admin_llm_server(
+    server_id: str,
+    admin_user: User = Depends(get_admin_user)
+):
+    """Get a specific system LLM server (admin only)."""
+    server = admin_llm_server_service.get_server(server_id)
+    if not server:
+        raise HTTPException(status_code=404, detail="Serveur LLM non trouvé")
+    return server
+
+@api_router.put("/admin/llm-servers/{server_id}")
+async def update_admin_llm_server(
+    server_id: str,
+    updates: AdminLLMServerUpdate,
+    admin_user: User = Depends(get_admin_user)
+):
+    """Update a system LLM server (admin only)."""
+    server = admin_llm_server_service.update_server(server_id, updates.dict(exclude_unset=True))
+    if not server:
+        raise HTTPException(status_code=404, detail="Serveur LLM non trouvé")
+    return server
+
+@api_router.delete("/admin/llm-servers/{server_id}")
+async def delete_admin_llm_server(
+    server_id: str,
+    admin_user: User = Depends(get_admin_user)
+):
+    """Delete a system LLM server (admin only)."""
+    success = admin_llm_server_service.delete_server(server_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Serveur LLM non trouvé")
+    return {"message": "Serveur LLM supprimé avec succès"}
+
+@api_router.post("/admin/llm-servers/{server_id}/test")
+async def test_admin_llm_server(
+    server_id: str,
+    admin_user: User = Depends(get_admin_user)
+):
+    """Test connection to a system LLM server (admin only)."""
+    result = admin_llm_server_service.test_server_connection(server_id)
+    return result
+
+# ===============================
 # Enhanced Prompt Routes
 # ===============================
 
