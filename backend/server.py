@@ -1106,7 +1106,7 @@ async def stream_prompt_execution(
         files_list = []
     
     # Use modified content if provided
-    content = modified_content or prompt.content
+    content = modified_content or prompt['content']
     
     # Get server configuration
     server_config = None
