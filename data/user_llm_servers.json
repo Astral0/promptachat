@@ -37,5 +37,18 @@
     "created_at": "2025-06-02T15:16:36.542175",
     "updated_at": "2025-06-02T15:16:36.782810",
     "is_active": false
+  },
+  "efa80052-14a7-4222-a9a9-b188725d8e75": {
+    "id": "efa80052-14a7-4222-a9a9-b188725d8e75",
+    "user_id": "_HkHVhXpcT80xLkhdhuHlQ",
+    "name": "Test Server",
+    "type": "openai",
+    "url": "https://api.openai.com",
+    "api_key": "test_key_123",
+    "default_model": "gpt-3.5-turbo",
+    "port": null,
+    "created_at": "2025-06-02T15:17:10.940805",
+    "updated_at": "2025-06-02T15:17:11.286949",
+    "is_active": false
   }
 }
