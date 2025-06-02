@@ -45,6 +45,7 @@ llm_service = LLMService()
 cockpit_service = CockpitService()
 user_llm_server_service = UserLLMServerService()
 category_service = CategoryService()
+admin_llm_server_service = AdminLLMServerService()
 
 # Create the main app
 app = FastAPI(
