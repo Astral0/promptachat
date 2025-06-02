@@ -151,6 +151,79 @@ backend:
         agent: "testing"
         comment: "Only found 2 prompts in the system, expected at least 20. No prompts found in the specified categories (Évaluation Fournisseur, Négociation, Analyse Contractuelle, etc.). The 20 new prompts mentioned in the requirements don't appear to have been implemented yet or they haven't been properly added to the database."
 
+frontend:
+  - task: "Settings Page - LLM Servers Section"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/UserSettings.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Successfully verified the 'Mes Serveurs LLM' section is present on the Settings page. The 'Ajouter un serveur' button opens a modal with all required fields (Nom du serveur, Type, URL, Port, Clé API, Modèle par défaut). The UI for adding a server works correctly."
+
+  - task: "Settings Page - Test Server Button"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/components/UserSettings.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "The 'Tester' button for LLM servers is present in the UI, but the backend API endpoint for testing server connections has issues (asyncio event loop error). This prevents the frontend from properly testing server connections."
+
+  - task: "Prompt Editor - Cockpit Variables"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/PromptEditor.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Successfully verified the 'Variables Cockpit' dropdown is present in the Prompt Editor. Clicking it shows a searchable list of variables. Selecting a variable adds it to the content with proper formatting. The 'Utilise les données Cockpit' checkbox is automatically checked when a variable is added."
+
+  - task: "Prompt Editor - Category Creation"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/PromptEditor.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Successfully verified the ability to create new categories from the Prompt Editor. The modal appears with fields for name and description. After creation, the new category is automatically selected."
+
+  - task: "Prompt Editor - Real-time Preview"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/PromptEditor.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Successfully verified the real-time preview functionality. Clicking the 'Aperçu' button shows a preview of the prompt with the correct title and content."
+
+  - task: "Prompt Library - Display and Filtering"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/PromptLibrary.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Successfully verified that prompts are displayed in the library. The category filtering dropdown is present and functional. However, there are only a few prompts in the system, which limits the testing of filtering functionality."
+
 metadata:
   created_by: "testing_agent"
   version: "1.0"
