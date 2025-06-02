@@ -78,5 +78,13 @@
     "created_by": null,
     "created_at": "2025-06-02T14:41:04.209196",
     "is_system": true
+  },
+  "1e80dae9-207d-43e7-9a50-69c4ea2118f3": {
+    "id": "1e80dae9-207d-43e7-9a50-69c4ea2118f3",
+    "name": "Test Category API",
+    "description": "This is a test category created via API",
+    "created_by": "_HkHVhXpcT80xLkhdhuHlQ",
+    "created_at": "2025-06-02T16:00:28.216957",
+    "is_system": false
   }
 }
