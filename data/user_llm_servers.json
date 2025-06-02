@@ -1,0 +1,15 @@
+{
+  "77ba60c5-2b57-4a9f-a4c0-ec9edb856c93": {
+    "id": "77ba60c5-2b57-4a9f-a4c0-ec9edb856c93",
+    "user_id": "_HkHVhXpcT80xLkhdhuHlQ",
+    "name": "Updated Test Ollama 151219",
+    "type": "ollama",
+    "url": "http://localhost:11434",
+    "api_key": null,
+    "default_model": "llama3:latest",
+    "port": null,
+    "created_at": "2025-06-02T15:12:19.604729",
+    "updated_at": "2025-06-02T15:12:19.721724",
+    "is_active": false
+  }
+}
