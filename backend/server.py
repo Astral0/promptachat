@@ -724,8 +724,83 @@ async def test_user_llm_server(
     if not server:
         raise HTTPException(status_code=404, detail="Serveur LLM non trouvé")
     
-    result = user_llm_server_service.test_server_connection(server)
-    return result
+    # Test asynchrone
+    import aiohttp
+    import time
+    
+    start_time = time.time()
+    
+    try:
+        timeout = aiohttp.ClientTimeout(total=10)
+        
+        if server.type.lower() == "ollama":
+            # Test Ollama server
+            url = f"{server.url.rstrip('/')}/api/tags"
+            
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.get(url) as response:
+                    response_time = time.time() - start_time
+                    
+                    if response.status == 200:
+                        data = await response.json()
+                        models = [model['name'] for model in data.get('models', [])]
+                        return {
+                            "status": "success",
+                            "message": "Connexion réussie",
+                            "response_time": response_time,
+                            "available_models": models
+                        }
+                    else:
+                        return {
+                            "status": "error",
+                            "message": f"Erreur HTTP {response.status}",
+                            "response_time": response_time,
+                            "available_models": []
+                        }
+        
+        else:  # OpenAI compatible
+            # Test OpenAI compatible server
+            url = f"{server.url.rstrip('/')}/v1/models"
+            headers = {}
+            
+            if server.api_key:
+                headers["Authorization"] = f"Bearer {server.api_key}"
+            
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.get(url, headers=headers) as response:
+                    response_time = time.time() - start_time
+                    
+                    if response.status == 200:
+                        data = await response.json()
+                        models = [model['id'] for model in data.get('data', [])]
+                        return {
+                            "status": "success",
+                            "message": "Connexion réussie",
+                            "response_time": response_time,
+                            "available_models": models
+                        }
+                    else:
+                        return {
+                            "status": "error",
+                            "message": f"Erreur HTTP {response.status}",
+                            "response_time": response_time,
+                            "available_models": []
+                        }
+                        
+    except aiohttp.ClientError:
+        return {
+            "status": "timeout",
+            "message": "Timeout de connexion",
+            "response_time": time.time() - start_time,
+            "available_models": []
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Erreur de connexion: {str(e)}",
+            "response_time": time.time() - start_time,
+            "available_models": []
+        }
 
 # ===============================
 # Category Routes  
