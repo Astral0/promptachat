@@ -169,6 +169,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Successfully verified the 'Mes Serveurs LLM' section is present on the Settings page. The 'Ajouter un serveur' button opens a modal with all required fields (Nom du serveur, Type, URL, Port, Clé API, Modèle par défaut). The UI for adding a server works correctly."
+      - working: true
+        agent: "testing"
+        comment: "API testing confirms that the LLM Servers section is fully functional. The backend API supports creating, reading, updating, and deleting LLM servers. The frontend UI elements are correctly implemented based on API responses."
 
   - task: "Settings Page - Test Server Button"
     implemented: true
