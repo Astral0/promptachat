@@ -169,4 +169,4 @@ test_plan:
 
 agent_communication:
   - agent: "testing"
-    message: "Tested all new backend features. Cockpit Variables API and Categories API are working correctly. User LLM Servers API has issues with the /all and /test endpoints. Enriched Prompts feature appears to be incomplete - only 2 prompts found instead of the expected 20+."
+    message: "Tested all new backend features. Cockpit Variables API and Categories API are working correctly. User LLM Servers API has issues with the /all and /test endpoints. The get_all_available_servers method is calling a non-existent method 'get_all_servers' on LLMServerManager (should be 'get_servers'). The test_server_connection method has an issue with asyncio event loops in FastAPI. Enriched Prompts feature appears to be incomplete - only 2 prompts found instead of the expected 20+. The new prompts need to be implemented or added to the database."
