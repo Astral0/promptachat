@@ -172,7 +172,7 @@ frontend:
 
   - task: "Settings Page - Test Server Button"
     implemented: true
-    working: false
+    working: true
     file: "/app/frontend/src/components/UserSettings.js"
     stuck_count: 0
     priority: "medium"
@@ -181,6 +181,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "The 'Tester' button for LLM servers is present in the UI, but the backend API endpoint for testing server connections has issues (asyncio event loop error). This prevents the frontend from properly testing server connections."
+      - working: true
+        agent: "testing"
+        comment: "The 'Tester' button for LLM servers now works correctly. The backend API endpoint for testing server connections has been fixed and returns the expected response. The frontend can now properly test server connections and display the results to the user."
 
   - task: "Prompt Editor - Cockpit Variables"
     implemented: true
