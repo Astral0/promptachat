@@ -142,20 +142,29 @@ backend:
         agent: "testing"
         comment: "Successfully tested all category endpoints: GET /api/categories (returned 10 default categories), GET /api/categories/dict, POST /api/categories, PUT /api/categories/{id}, POST /api/categories/suggest (correctly suggested 'Analyse Contractuelle'), and DELETE /api/categories/{id}"
 
-  - task: "Enriched Prompts"
+  - task: "Admin LLM Servers API"
     implemented: true
-    working: true
-    file: "/app/backend/server.py"
+    working: false
+    file: "/app/backend/services/admin_llm_server_service.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: false
         agent: "testing"
-        comment: "Only found 2 prompts in the system, expected at least 20. No prompts found in the specified categories (Évaluation Fournisseur, Négociation, Analyse Contractuelle, etc.). The 20 new prompts mentioned in the requirements don't appear to have been implemented yet or they haven't been properly added to the database."
-      - working: true
+        comment: "The POST /api/admin/llm-servers endpoint works correctly to create a new server, but GET /api/admin/llm-servers/{id} returns 404 Not Found. The issue might be in the admin_llm_server_service.py file where the get_server method doesn't correctly handle the server ID."
+
+  - task: "Advanced Prompt Execution"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
         agent: "testing"
-        comment: "Successfully tested the Enriched Prompts feature. GET /api/prompts now returns 7 internal prompts, which meets the requirement of at least 6 prompts. All prompts correctly use 'uses_cockpit_data' instead of 'needs_cockpit'. Found prompts in the 'Négociation' category. The API is working correctly and returning the expected data structure."
+        comment: "The POST /api/prompts/{prompt_id}/validate endpoint returns a 500 Internal Server Error. The error is 'AttributeError: 'PromptService' object has no attribute 'get_prompt'' - it seems the method is called 'get_prompt_by_id' instead of 'get_prompt'. This needs to be fixed in the validate_prompt_execution function in server.py."
 
 frontend:
   - task: "Settings Page - LLM Servers Section"
