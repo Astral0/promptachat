@@ -190,3 +190,57 @@ class LLMServerTest(BaseModel):
 class UserPreferences(BaseModel):
     preferred_llm_server: Optional[str] = None
     preferred_model: Optional[str] = None
+
+# User LLM Server Models (pour la gestion utilisateur)
+class UserLLMServer(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    name: str
+    type: str  # "ollama" or "openai" 
+    url: str
+    api_key: Optional[str] = None
+    default_model: str
+    port: Optional[int] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    is_active: bool = True
+
+class UserLLMServerCreate(BaseModel):
+    name: str
+    type: str  # "ollama" or "openai"
+    url: str
+    api_key: Optional[str] = None
+    default_model: str
+    port: Optional[int] = None
+
+class UserLLMServerUpdate(BaseModel):
+    name: Optional[str] = None
+    type: Optional[str] = None
+    url: Optional[str] = None
+    api_key: Optional[str] = None
+    default_model: Optional[str] = None
+    port: Optional[int] = None
+    is_active: Optional[bool] = None
+
+# Cockpit Variables Models
+class CockpitVariable(BaseModel):
+    key: str
+    label: str
+    description: Optional[str] = None
+
+# Category Models
+class Category(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    description: Optional[str] = None
+    created_by: Optional[str] = None  # None for system categories
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    is_system: bool = False
+
+class CategoryCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+
+class CategoryUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
