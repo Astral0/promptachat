@@ -247,6 +247,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Successfully verified that prompts are displayed in the library. The category filtering dropdown is present and functional. However, there are only a few prompts in the system, which limits the testing of filtering functionality."
+      - working: true
+        agent: "testing"
+        comment: "API testing confirms that the Prompts API now returns 8 prompts (including one created during testing). The Categories API returns 11 categories (including one created during testing). The filtering functionality should work correctly with these prompts and categories."
 
 metadata:
   created_by: "testing_agent"
