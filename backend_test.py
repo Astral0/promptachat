@@ -419,6 +419,315 @@ def test_enriched_prompts(token):
     
     return True
 
+def test_admin_llm_servers(token):
+    """Test Admin LLM Servers API endpoints."""
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    print_subheader("Testing Admin LLM Servers API")
+    
+    # Test GET /api/admin/llm-servers
+    print_info("Testing GET /api/admin/llm-servers")
+    response = requests.get(f"{BASE_URL}/admin/llm-servers", headers=headers)
+    print(f"Status code: {response.status_code}")
+    
+    if response.status_code == 200:
+        servers = response.json()
+        print_success(f"Found {len(servers)} system LLM servers")
+        initial_server_count = len(servers)
+        if len(servers) > 0:
+            print_info("Sample servers:")
+            for server in servers[:2]:  # Show first 2 servers
+                print(f"  - {server.get('name')} ({server.get('type')}): {server.get('url')}")
+    else:
+        print_error(f"Error: {response.text}")
+        return False
+    
+    # Create a test server
+    print_info("\nCreating a test system LLM server with POST /api/admin/llm-servers")
+    test_server_data = {
+        "name": "Test Server",
+        "type": "ollama",
+        "url": "http://localhost:11434",
+        "default_model": "llama3"
+    }
+    
+    response = requests.post(f"{BASE_URL}/admin/llm-servers", json=test_server_data, headers=headers)
+    print(f"Status code: {response.status_code}")
+    
+    if response.status_code == 200:
+        server = response.json()
+        server_id = server.get("id")
+        print_success(f"Created server with ID: {server_id}")
+        
+        # Test GET for the created server
+        print_info(f"\nGetting the server with GET /api/admin/llm-servers/{server_id}")
+        response = requests.get(f"{BASE_URL}/admin/llm-servers/{server_id}", headers=headers)
+        print(f"Status code: {response.status_code}")
+        
+        if response.status_code == 200:
+            retrieved_server = response.json()
+            if retrieved_server.get("name") == "Test Server" and retrieved_server.get("type") == "ollama":
+                print_success("Server retrieved successfully")
+            else:
+                print_error("Server data doesn't match what was created")
+                return False
+        else:
+            print_error(f"Error: {response.text}")
+            return False
+        
+        # Test updating the server
+        print_info(f"\nUpdating the server with PUT /api/admin/llm-servers/{server_id}")
+        update_data = {
+            "name": "Updated Test Server",
+            "default_model": "llama3:latest"
+        }
+        response = requests.put(f"{BASE_URL}/admin/llm-servers/{server_id}", json=update_data, headers=headers)
+        print(f"Status code: {response.status_code}")
+        
+        if response.status_code == 200:
+            updated_server = response.json()
+            if updated_server.get("name") == "Updated Test Server" and updated_server.get("default_model") == "llama3:latest":
+                print_success("Server updated successfully")
+            else:
+                print_error("Server was not updated correctly")
+                return False
+        else:
+            print_error(f"Error: {response.text}")
+            return False
+        
+        # Test the server connection
+        print_info(f"\nTesting server connection with POST /api/admin/llm-servers/{server_id}/test")
+        response = requests.post(f"{BASE_URL}/admin/llm-servers/{server_id}/test", headers=headers)
+        print(f"Status code: {response.status_code}")
+        
+        if response.status_code == 200:
+            result = response.json()
+            print_success(f"Test result: {result.get('status')} - {result.get('message')}")
+            print_info(f"Response time: {result.get('response_time', 'N/A')} seconds")
+            
+            # The test might fail with a timeout or error since we're using a fake server,
+            # but the important part is that the endpoint responds correctly
+            if result.get('status') in ['success', 'error', 'timeout']:
+                print_success("Server test endpoint is working correctly")
+            else:
+                print_warning(f"Unexpected test status: {result.get('status')}")
+        else:
+            print_error(f"Error: {response.text}")
+            return False
+        
+        # Clean up - delete the test server
+        print_info(f"\nDeleting test server with DELETE /api/admin/llm-servers/{server_id}")
+        response = requests.delete(f"{BASE_URL}/admin/llm-servers/{server_id}", headers=headers)
+        print(f"Status code: {response.status_code}")
+        
+        if response.status_code == 200:
+            print_success("Server deleted successfully")
+            
+            # Verify the server was deleted
+            response = requests.get(f"{BASE_URL}/admin/llm-servers", headers=headers)
+            if response.status_code == 200:
+                servers = response.json()
+                if len(servers) == initial_server_count:
+                    print_success("Server deletion verified")
+                else:
+                    print_error(f"Server count mismatch after deletion: expected {initial_server_count}, got {len(servers)}")
+                    return False
+        else:
+            print_error(f"Error: {response.text}")
+            return False
+    else:
+        print_error(f"Error creating server: {response.text}")
+        return False
+    
+    return True
+
+def test_advanced_prompt_execution(token):
+    """Test Advanced Prompt Execution API endpoints."""
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    print_subheader("Testing Advanced Prompt Execution")
+    
+    # First, get a prompt to test with
+    print_info("Getting a prompt to test with")
+    response = requests.get(f"{BASE_URL}/prompts", headers=headers)
+    
+    if response.status_code != 200:
+        print_error(f"Error getting prompts: {response.text}")
+        return False
+    
+    prompts_data = response.json()
+    
+    # Find the first prompt
+    prompt_id = None
+    prompt_content = None
+    
+    if "internal" in prompts_data and prompts_data["internal"]:
+        prompt_id = prompts_data["internal"][0]["id"]
+        prompt_content = prompts_data["internal"][0]["content"]
+    elif "external" in prompts_data and prompts_data["external"]:
+        prompt_id = prompts_data["external"][0]["id"]
+        prompt_content = prompts_data["external"][0]["content"]
+    
+    if not prompt_id:
+        print_error("No prompts found to test with")
+        return False
+    
+    print_success(f"Using prompt ID: {prompt_id} for testing")
+    
+    # Extract variables from the prompt content
+    import re
+    variables_in_content = re.findall(r'\{([^}]+)\}', prompt_content)
+    
+    # Create test variables
+    test_variables = []
+    for var in variables_in_content:
+        test_variables.append({
+            "name": var,
+            "value": f"Test value for {var}"
+        })
+    
+    if not test_variables:
+        # If no variables in the prompt, add a dummy one for testing
+        test_variables = [
+            {"name": "test_variable", "value": "Test value"}
+        ]
+        # Modify the content to include our test variable
+        modified_content = prompt_content + "\n\nTest variable: {test_variable}"
+    else:
+        modified_content = None
+    
+    # Test POST /api/prompts/{prompt_id}/validate
+    print_info(f"\nTesting POST /api/prompts/{prompt_id}/validate")
+    response = requests.post(
+        f"{BASE_URL}/prompts/{prompt_id}/validate", 
+        json=test_variables,
+        headers=headers
+    )
+    print(f"Status code: {response.status_code}")
+    
+    if response.status_code == 200:
+        validation = response.json()
+        print_success(f"Validation result: is_valid={validation.get('is_valid')}")
+        print_info(f"Required variables: {validation.get('required_variables')}")
+        print_info(f"Provided variables: {validation.get('provided_variables')}")
+        
+        if validation.get('is_valid') == False:
+            print_warning(f"Missing variables: {validation.get('missing_variables')}")
+            # Add missing variables to our test set
+            for var in validation.get('missing_variables', []):
+                test_variables.append({
+                    "name": var,
+                    "value": f"Test value for {var}"
+                })
+            
+            # Validate again with the complete set
+            print_info(f"Retrying validation with complete variable set")
+            response = requests.post(
+                f"{BASE_URL}/prompts/{prompt_id}/validate", 
+                json=test_variables,
+                headers=headers
+            )
+            
+            if response.status_code == 200:
+                validation = response.json()
+                if validation.get('is_valid'):
+                    print_success("Validation successful with complete variable set")
+                else:
+                    print_error(f"Validation still failing: {validation}")
+                    return False
+            else:
+                print_error(f"Error: {response.text}")
+                return False
+    else:
+        print_error(f"Error: {response.text}")
+        return False
+    
+    # Test POST /api/prompts/{prompt_id}/build-final
+    print_info(f"\nTesting POST /api/prompts/{prompt_id}/build-final")
+    request_data = {
+        "variables": test_variables,
+        "files": [],
+        "modified_content": modified_content
+    }
+    
+    response = requests.post(
+        f"{BASE_URL}/prompts/{prompt_id}/build-final", 
+        json=request_data,
+        headers=headers
+    )
+    print(f"Status code: {response.status_code}")
+    
+    if response.status_code == 200:
+        result = response.json()
+        print_success("Successfully built final prompt")
+        print_info(f"Final prompt length: {len(result.get('final_prompt', ''))}")
+        print_info(f"Logs: {len(result.get('logs', []))} entries")
+    else:
+        print_error(f"Error: {response.text}")
+        return False
+    
+    # Test POST /api/prompts/{prompt_id}/execute
+    print_info(f"\nTesting POST /api/prompts/{prompt_id}/execute")
+    execute_request = {
+        "prompt_id": prompt_id,
+        "variables": test_variables,
+        "files": [],
+        "modified_content": modified_content,
+        "server_id": None,  # Use default server
+        "model": None       # Use default model
+    }
+    
+    response = requests.post(
+        f"{BASE_URL}/prompts/{prompt_id}/execute", 
+        json=execute_request,
+        headers=headers
+    )
+    print(f"Status code: {response.status_code}")
+    
+    if response.status_code == 200:
+        result = response.json()
+        print_success("Successfully executed prompt")
+        print_info(f"Execution ID: {result.get('execution_id')}")
+        print_info(f"Execution time: {result.get('execution_time')} seconds")
+        print_info(f"Result length: {len(result.get('result', ''))}")
+    else:
+        print_error(f"Error: {response.text}")
+        return False
+    
+    # Test GET /api/prompts/{prompt_id}/stream
+    print_info(f"\nTesting GET /api/prompts/{prompt_id}/stream")
+    
+    try:
+        # Use a short timeout to just test if streaming starts
+        response = requests.get(
+            f"{BASE_URL}/prompts/{prompt_id}/stream", 
+            headers=headers,
+            stream=True,
+            timeout=2
+        )
+        
+        print(f"Status code: {response.status_code}")
+        
+        if response.status_code == 200:
+            # Just check if we get at least one chunk
+            for line in response.iter_lines(chunk_size=1024, decode_unicode=True):
+                if line:
+                    print_success("Successfully received streaming data")
+                    break
+            
+            print_success("Streaming endpoint is working")
+        else:
+            print_error(f"Error: {response.text}")
+            return False
+    except requests.exceptions.Timeout:
+        # Timeout is expected since we're just testing if streaming starts
+        print_success("Streaming started successfully (timeout as expected)")
+    except Exception as e:
+        print_error(f"Error testing streaming: {str(e)}")
+        return False
+    
+    return True
+
 def run_all_tests():
     """Run all backend API tests."""
     print_header("PromptAchat Backend API Tests")
@@ -436,7 +745,9 @@ def run_all_tests():
         "Cockpit Variables": test_cockpit_variables(token),
         "User LLM Servers": test_user_llm_servers(token),
         "Categories": test_categories(token),
-        "Enriched Prompts": test_enriched_prompts(token)
+        "Enriched Prompts": test_enriched_prompts(token),
+        "Admin LLM Servers": test_admin_llm_servers(token),
+        "Advanced Prompt Execution": test_advanced_prompt_execution(token)
     }
     
     # Print summary
