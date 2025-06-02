@@ -277,10 +277,9 @@ class PromptExecutionResult(BaseModel):
     execution_time: float
     tokens_used: Optional[int] = None
     cost: Optional[float] = None
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    name: str
-    description: Optional[str] = None
-    created_by: Optional[str] = None  # None for system categories
+
+# Category Models
+class Category(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     is_system: bool = False
 
