@@ -50,6 +50,21 @@
       "updated_at": "2025-05-29 19:03:57.763199",
       "is_public": false,
       "based_on_system_prompt": "analyse_contrat"
+    },
+    {
+      "title": "Test",
+      "content": "dis Hello\n",
+      "variables": [],
+      "accepts_files": false,
+      "needs_cockpit": false,
+      "category": "Négociation",
+      "welcome_page_html": "hhh",
+      "id": "98a28046-20da-43c0-87ae-18676494db8c",
+      "created_by": "_HkHVhXpcT80xLkhdhuHlQ",
+      "created_at": "2025-06-02 14:59:59.780440",
+      "updated_at": "2025-06-02 14:59:59.780442",
+      "is_public": false,
+      "based_on_system_prompt": null
     }
   ],
   "external": []
