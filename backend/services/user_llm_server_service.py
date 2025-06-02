@@ -112,92 +112,78 @@ class UserLLMServerService:
     
     def test_server_connection(self, server: UserLLMServer) -> Dict[str, Any]:
         """Test connection to a user LLM server."""
-        import aiohttp
-        import asyncio
+        import requests
         import time
         
-        async def _test_connection():
-            start_time = time.time()
-            
-            try:
-                timeout = aiohttp.ClientTimeout(total=10)
-                
-                if server.type.lower() == "ollama":
-                    # Test Ollama server
-                    url = f"{server.url.rstrip('/')}/api/tags"
-                    
-                    async with aiohttp.ClientSession(timeout=timeout) as session:
-                        async with session.get(url) as response:
-                            response_time = time.time() - start_time
-                            
-                            if response.status == 200:
-                                data = await response.json()
-                                models = [model['name'] for model in data.get('models', [])]
-                                return {
-                                    "status": "success",
-                                    "message": "Connexion réussie",
-                                    "response_time": response_time,
-                                    "available_models": models
-                                }
-                            else:
-                                return {
-                                    "status": "error",
-                                    "message": f"Erreur HTTP {response.status}",
-                                    "response_time": response_time,
-                                    "available_models": []
-                                }
-                
-                else:  # OpenAI compatible
-                    # Test OpenAI compatible server
-                    url = f"{server.url.rstrip('/')}/v1/models"
-                    headers = {}
-                    
-                    if server.api_key:
-                        headers["Authorization"] = f"Bearer {server.api_key}"
-                    
-                    async with aiohttp.ClientSession(timeout=timeout) as session:
-                        async with session.get(url, headers=headers) as response:
-                            response_time = time.time() - start_time
-                            
-                            if response.status == 200:
-                                data = await response.json()
-                                models = [model['id'] for model in data.get('data', [])]
-                                return {
-                                    "status": "success",
-                                    "message": "Connexion réussie",
-                                    "response_time": response_time,
-                                    "available_models": models
-                                }
-                            else:
-                                return {
-                                    "status": "error",
-                                    "message": f"Erreur HTTP {response.status}",
-                                    "response_time": response_time,
-                                    "available_models": []
-                                }
-                                
-            except asyncio.TimeoutError:
-                return {
-                    "status": "timeout",
-                    "message": "Timeout de connexion",
-                    "response_time": time.time() - start_time,
-                    "available_models": []
-                }
-            except Exception as e:
-                return {
-                    "status": "error",
-                    "message": f"Erreur de connexion: {str(e)}",
-                    "response_time": time.time() - start_time,
-                    "available_models": []
-                }
+        start_time = time.time()
         
-        # Run the async function
         try:
-            loop = asyncio.get_event_loop()
-            return loop.run_until_complete(_test_connection())
-        except RuntimeError:
-            # If no event loop is running, create a new one
-            return asyncio.run(_test_connection())
+            if server.type.lower() == "ollama":
+                # Test Ollama server
+                url = f"{server.url.rstrip('/')}/api/tags"
+                
+                response = requests.get(url, timeout=10)
+                response_time = time.time() - start_time
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    models = [model['name'] for model in data.get('models', [])]
+                    return {
+                        "status": "success",
+                        "message": "Connexion réussie",
+                        "response_time": response_time,
+                        "available_models": models
+                    }
+                else:
+                    return {
+                        "status": "error",
+                        "message": f"Erreur HTTP {response.status_code}",
+                        "response_time": response_time,
+                        "available_models": []
+                    }
+            
+            else:  # OpenAI compatible
+                # Test OpenAI compatible server
+                url = f"{server.url.rstrip('/')}/v1/models"
+                headers = {}
+                
+                if server.api_key:
+                    headers["Authorization"] = f"Bearer {server.api_key}"
+                
+                response = requests.get(url, headers=headers, timeout=10)
+                response_time = time.time() - start_time
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    models = [model['id'] for model in data.get('data', [])]
+                    return {
+                        "status": "success",
+                        "message": "Connexion réussie",
+                        "response_time": response_time,
+                        "available_models": models
+                    }
+                else:
+                    return {
+                        "status": "error",
+                        "message": f"Erreur HTTP {response.status_code}",
+                        "response_time": response_time,
+                        "available_models": []
+                    }
+                                
+        except requests.exceptions.Timeout:
+            return {
+                "status": "timeout",
+                "message": "Timeout de connexion",
+                "response_time": time.time() - start_time,
+                "available_models": []
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": f"Erreur de connexion: {str(e)}",
+                "response_time": time.time() - start_time,
+                "available_models": []
+            }
     
     def get_all_available_servers(self, user_id: str) -> List[Dict[str, Any]]:
         """Get all available servers (system + user) for a user."""
