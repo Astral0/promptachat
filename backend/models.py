@@ -280,6 +280,10 @@ class PromptExecutionResult(BaseModel):
 
 # Category Models
 class Category(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    description: Optional[str] = None
+    created_by: Optional[str] = None  # None for system categories
     created_at: datetime = Field(default_factory=datetime.utcnow)
     is_system: bool = False
 
