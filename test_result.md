@@ -202,6 +202,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Successfully verified the 'Variables Cockpit' dropdown is present in the Prompt Editor. Clicking it shows a searchable list of variables. Selecting a variable adds it to the content with proper formatting. The 'Utilise les données Cockpit' checkbox is automatically checked when a variable is added."
+      - working: true
+        agent: "testing"
+        comment: "API testing confirms that the Cockpit Variables API returns 66 variables, which are available for use in the Prompt Editor. The API also correctly extracts variables from content and sets 'uses_cockpit_data' to true when variables are detected."
 
   - task: "Prompt Editor - Category Creation"
     implemented: true
