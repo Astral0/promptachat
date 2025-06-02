@@ -11,5 +11,18 @@
     "created_at": "2025-06-02T15:12:19.604729",
     "updated_at": "2025-06-02T15:12:19.721724",
     "is_active": false
+  },
+  "5458ca13-c39e-4270-8c9f-1f0eed98371f": {
+    "id": "5458ca13-c39e-4270-8c9f-1f0eed98371f",
+    "user_id": "_HkHVhXpcT80xLkhdhuHlQ",
+    "name": "Updated Test Ollama 151239",
+    "type": "ollama",
+    "url": "http://localhost:11434",
+    "api_key": null,
+    "default_model": "llama3:latest",
+    "port": null,
+    "created_at": "2025-06-02T15:12:40.227097",
+    "updated_at": "2025-06-02T15:12:40.297310",
+    "is_active": false
   }
 }
